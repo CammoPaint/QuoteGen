@@ -1,0 +1,98 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can read and write their own data
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      // Admin users can read all users in their company
+      allow read: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      // Admin users can update user roles
+      allow update: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' &&
+        request.resource.data.keys().hasOnly(['role', 'updatedAt']);
+    }
+    
+    // Invitations - only admin users can manage
+    match /invitations/{invitationId} {
+      allow read, write: if request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      // Users can read their own invitation by email
+      allow read: if request.auth != null && 
+        resource.data.email == request.auth.token.email;
+    }
+    
+    // Customers - authenticated users can access templates
+    match /customers/{customerId} {
+        allow read, write: if request.auth != null;
+    }
+
+    // Deals - sales pipeline items
+    match /deals/{dealId} {
+      // Read allowed if the user owns the deal or is admin/sales_manager
+      allow read: if request.auth != null && (
+        resource.data.userId == request.auth.uid ||
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'sales_manager'])
+      );
+
+      // Create allowed only by the owner (agent creating their own deal)
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+
+      // Update/Delete allowed by owner or admin/sales_manager
+      allow update, delete: if request.auth != null && (
+        resource.data.userId == request.auth.uid ||
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'sales_manager'])
+      );
+    }
+
+    // Commissions - visibility depends on role/ownership
+    match /commissions/{commissionId} {
+      // Read allowed if admin/sales_manager, or the agent who owns the commission
+      allow read: if request.auth != null && (
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'sales_manager']) ||
+        resource.data.agentId == request.auth.uid
+      );
+
+      // Create allowed by admin/sales_manager, or the agent creating their own commission
+      allow create: if request.auth != null && (
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'sales_manager']) ||
+        request.resource.data.agentId == request.auth.uid
+      );
+
+      // Update/Delete allowed by admin/sales_manager, or the agent who owns the commission
+      allow update, delete: if request.auth != null && (
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['admin', 'sales_manager']) ||
+        resource.data.agentId == request.auth.uid
+      );
+    }
+    
+    // Quotes - authenticated users can access templates
+    match /quotes/{quoteId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Counters for sequential IDs (e.g., quotes, leads)
+    match /counters/{counterId} {
+      // Allow authenticated users to read/write only known counters
+      allow read, write: if request.auth != null && counterId in ['quotes', 'leads'];
+    }
+    
+    // Tasks - authenticated users can access templates
+    match /tasks/{taskId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // PDF Templates - authenticated users can access templates
+    match /pdfTemplates/{templateId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Companies - users can access their own company
+    match /companies/{companyId} {
+      allow read, write: if request.auth != null &&
+        (request.auth.uid == companyId ||
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.companyId == companyId);
+      allow create: if request.auth != null;
+    }
+  }
+}
