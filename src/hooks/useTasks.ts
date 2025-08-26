@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Task } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import { taskService } from '../services/taskService';
+import { userService } from '../services/userService';
 
 export const useTasks = () => {
   const { user } = useAuth();
@@ -16,7 +17,20 @@ export const useTasks = () => {
     setError(null);
     
     try {
-      const fetchedTasks = await taskService.getTasks(user.id);
+      let fetchedTasks: Task[] = [];
+
+      // Admins and sales managers: load tasks for all users in their company if available
+      if ((user.role === 'admin' || user.role === 'sales_manager') && user.companyId) {
+        const companyUsers = await userService.getUsersByCompany(user.companyId);
+        const allTasksArrays = await Promise.all(companyUsers.map(u => taskService.getTasks(u.id)));
+        fetchedTasks = allTasksArrays.flat();
+      } else {
+        // Standard users: only their own tasks
+        fetchedTasks = await taskService.getTasks(user.id);
+      }
+
+      // Sort by dateDue ascending for consistency
+      fetchedTasks.sort((a, b) => new Date(a.dateDue).getTime() - new Date(b.dateDue).getTime());
       setTasks(fetchedTasks);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load tasks');

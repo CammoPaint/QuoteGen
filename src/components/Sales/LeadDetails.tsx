@@ -6,6 +6,7 @@ import { useLeads } from '../../hooks/useLeads';
 import { useQuotes } from '../../hooks/useQuotes';
 import { useTasks } from '../../hooks/useTasks';
 import { Trash2 } from 'lucide-react';
+import { buildUpdatedRecord } from '../../utils/customerLeadMappers';
 
 interface LeadDetailsProps {
   leadId: string;
@@ -57,21 +58,7 @@ export const LeadDetails: React.FC<LeadDetailsProps> = ({
     if (!lead) return;
 
     try {
-      const updatedLead: Customer = {
-        ...lead,
-        companyName: formData.companyName,
-        contactName: formData.contactName,
-        emailAddress: formData.emailAddress,
-        phoneNumber: formData.phoneNumber,
-        contactEmail: formData.emailAddress,
-        contactPhone: formData.phoneNumber,
-        industry: formData.industry,
-        source: formData.source,
-        status: formData.status,
-        notes: formData.notes,
-        updatedAt: new Date().toISOString()
-      };
-
+      const updatedLead: Customer = buildUpdatedRecord(lead, formData);
       await updateLead(lead.id, updatedLead);
       setLead(updatedLead);
     } catch (error) {
@@ -215,7 +202,7 @@ export const LeadDetails: React.FC<LeadDetailsProps> = ({
                 </p>
                 <div className="bg-gray-50 p-3 rounded-md">
                   <p className="text-sm font-medium text-gray-900">{lead.companyName}</p>
-                  <p className="text-sm text-gray-500">{lead.contactName} • {lead.contactEmail}</p>
+                  <p className="text-sm text-gray-500">{lead.contactName} • {lead.emailAddress}</p>
                 </div>
               </div>
               

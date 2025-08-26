@@ -9,7 +9,11 @@ import {
   query, 
   where, 
   orderBy, 
-  serverTimestamp
+  serverTimestamp,
+  limit as fsLimit,
+  startAfter,
+  DocumentData,
+  QueryDocumentSnapshot
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { Customer } from '../types';
@@ -48,6 +52,115 @@ export const customerService = {
     } catch (error) {
       console.error('Error fetching customers:', error);
       throw new Error('Failed to fetch customers');
+    }
+  },
+
+  // Paginated lead queries
+  async getLeadsPageAll(pageSize: number, cursor?: QueryDocumentSnapshot<DocumentData>): Promise<{ items: Customer[]; lastDoc?: QueryDocumentSnapshot<DocumentData> }>{
+    try {
+      const constraints: any[] = [
+        where('customerType', '==', 'lead'),
+        orderBy('createdAt', 'desc'),
+        fsLimit(pageSize),
+      ];
+      if (cursor) constraints.push(startAfter(cursor));
+
+      const q = query(collection(db, COLLECTION_NAME), ...constraints);
+      const snapshot = await getDocs(q);
+      const items = snapshot.docs.map(d => ({
+        id: d.id,
+        ...d.data(),
+        customerType: (d.data() as any).customerType ?? 'lead',
+        createdAt: d.data().createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+        updatedAt: d.data().updatedAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+      })) as Customer[];
+      const lastDoc = snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : undefined;
+      return { items, lastDoc };
+    } catch (error) {
+      console.error('Error fetching leads page (all):', error);
+      throw new Error('Failed to fetch leads');
+    }
+  },
+
+  async getLeadsPageForCompany(companyId: string, pageSize: number, cursor?: QueryDocumentSnapshot<DocumentData>): Promise<{ items: Customer[]; lastDoc?: QueryDocumentSnapshot<DocumentData> }>{
+    try {
+      const constraints: any[] = [
+        where('companyId', '==', companyId),
+        where('customerType', '==', 'lead'),
+        orderBy('createdAt', 'desc'),
+        fsLimit(pageSize),
+      ];
+      if (cursor) constraints.push(startAfter(cursor));
+
+      const q = query(collection(db, COLLECTION_NAME), ...constraints);
+      const snapshot = await getDocs(q);
+      const items = snapshot.docs.map(d => ({
+        id: d.id,
+        ...d.data(),
+        customerType: (d.data() as any).customerType ?? 'lead',
+        createdAt: d.data().createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+        updatedAt: d.data().updatedAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+      })) as Customer[];
+      const lastDoc = snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : undefined;
+      return { items, lastDoc };
+    } catch (error) {
+      console.error('Error fetching leads page (company):', error);
+      throw new Error('Failed to fetch leads');
+    }
+  },
+
+  async getLeadsPageForUser(userId: string, pageSize: number, cursor?: QueryDocumentSnapshot<DocumentData>): Promise<{ items: Customer[]; lastDoc?: QueryDocumentSnapshot<DocumentData> }>{
+    try {
+      const constraints: any[] = [
+        where('userId', '==', userId),
+        where('customerType', '==', 'lead'),
+        orderBy('createdAt', 'desc'),
+        fsLimit(pageSize),
+      ];
+      if (cursor) constraints.push(startAfter(cursor));
+
+      const q = query(collection(db, COLLECTION_NAME), ...constraints);
+      const snapshot = await getDocs(q);
+      const items = snapshot.docs.map(d => ({
+        id: d.id,
+        ...d.data(),
+        customerType: (d.data() as any).customerType ?? 'lead',
+        createdAt: d.data().createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+        updatedAt: d.data().updatedAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+      })) as Customer[];
+      const lastDoc = snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : undefined;
+      return { items, lastDoc };
+    } catch (error) {
+      console.error('Error fetching leads page (user):', error);
+      throw new Error('Failed to fetch leads');
+    }
+  },
+
+  // Leads assigned to a specific user (server-side filter by assignedToUserId)
+  async getLeadsPageAssignedTo(userId: string, pageSize: number, cursor?: QueryDocumentSnapshot<DocumentData>): Promise<{ items: Customer[]; lastDoc?: QueryDocumentSnapshot<DocumentData> }>{
+    try {
+      const constraints: any[] = [
+        where('assignedToUserId', '==', userId),
+        where('customerType', '==', 'lead'),
+        orderBy('createdAt', 'desc'),
+        fsLimit(pageSize),
+      ];
+      if (cursor) constraints.push(startAfter(cursor));
+
+      const q = query(collection(db, COLLECTION_NAME), ...constraints);
+      const snapshot = await getDocs(q);
+      const items = snapshot.docs.map(d => ({
+        id: d.id,
+        ...d.data(),
+        customerType: (d.data() as any).customerType ?? 'lead',
+        createdAt: d.data().createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+        updatedAt: d.data().updatedAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+      })) as Customer[];
+      const lastDoc = snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : undefined;
+      return { items, lastDoc };
+    } catch (error) {
+      console.error('Error fetching leads page (assignedTo):', error);
+      throw new Error('Failed to fetch leads');
     }
   },
 

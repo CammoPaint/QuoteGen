@@ -547,7 +547,7 @@ export const LeadSearch: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
-          <div ref={mapRef} className="w-full h-[380px] rounded-md" />
+          <div ref={mapRef} className="w-full h-[580px] rounded-md" />
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, User, Building, DollarSign, Calendar, Filter, ChevronDown } from 'lucide-react';
+import { Plus, User, Building, DollarSign, Calendar } from 'lucide-react';
 import { Deal } from '../../types';
 import { useDeals } from '../../hooks/useDeals';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUsers } from '../../hooks/useUsers';
 import DealModal from './DealModal';
 import { useCustomers } from '../../hooks/useCustomers';
+import UserFilterDropdown from '../Shared/UserFilterDropdown';
 
 interface SalesPipelineProps {
   onViewDeal?: (deal: Deal) => void;
@@ -28,7 +29,7 @@ export const SalesPipeline: React.FC<SalesPipelineProps> = ({ onEditDeal: _ }) =
   const [draggedDeal, setDraggedDeal] = useState<Deal | null>(null);
   const [dragOverStageId, setDragOverStageId] = useState<Deal['pipelineStage'] | null>(null);
   const [selectedUser, setSelectedUser] = useState<string>('');
-  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editingDeal, setEditingDeal] = useState<Deal | null>(null);
@@ -78,24 +79,6 @@ export const SalesPipeline: React.FC<SalesPipelineProps> = ({ onEditDeal: _ }) =
       setSelectedUser(user.id);
     }
   }, [user, selectedUser, setFilterUserId]);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (userDropdownOpen) {
-        const target = event.target as Element;
-        // Check if the click is outside the dropdown container
-        if (!target.closest('.user-dropdown-container')) {
-          setUserDropdownOpen(false);
-        }
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [userDropdownOpen]);
 
   const handleDragStart = (e: React.DragEvent, deal: Deal) => {
     setDraggedDeal(deal);
@@ -166,19 +149,6 @@ export const SalesPipeline: React.FC<SalesPipelineProps> = ({ onEditDeal: _ }) =
     }).format(amount);
   };
 
-  const getSelectedUserName = () => {
-    if (selectedUser === 'all') {
-      return 'All Users';
-    }
-    const userName = getUserName(selectedUser);
-    console.log('Getting selected user name (Pipeline):', { selectedUser, userName, availableUsers: getAvailableUsers().length });
-    return userName || 'Select User';
-  };
-
-  // const formatDate = (dateString: string) => {
-  //   return new Date(dateString).toLocaleDateString();
-  // };
-
   if (dealsLoading || usersLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -205,57 +175,16 @@ export const SalesPipeline: React.FC<SalesPipelineProps> = ({ onEditDeal: _ }) =
         </div>
         <div className="flex items-center space-x-4">
           {getAvailableUsers().length > 1 && (
-            <div className="flex items-center space-x-2 relative user-dropdown-container">
-              <Filter className="h-4 w-4 text-gray-500" />
-              <div className="relative">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setUserDropdownOpen(!userDropdownOpen);
-                  }}
-                  className="flex items-center space-x-2 px-3 py-1 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50 focus:ring-2 focus:ring-brand focus:border-transparent"
-                >
-                  <span>{getSelectedUserName()}</span>
-                  <ChevronDown className="h-3 w-3 text-gray-400" />
-                </button>
-                {userDropdownOpen && (
-                  <div className="absolute z-10 top-full mt-1 w-48 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
-                    {(user?.role === 'admin' || user?.role === 'sales_manager') && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          console.log('Selecting All Users');
-                          setSelectedUser('all');
-                          setUserDropdownOpen(false);
-                        }}
-                        className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${selectedUser === 'all' ? 'bg-blue-50 text-blue-700' : 'text-gray-700'}`}
-                      >
-                        <div className="font-medium">All Users</div>
-                        <div className="text-xs text-gray-500">View deals from all team members</div>
-                      </button>
-                    )}
-                    {(user?.role === 'admin' || user?.role === 'sales_manager') && getAvailableUsers().length > 0 && (
-                      <div className="border-t border-gray-200 my-1"></div>
-                    )}
-                    {getAvailableUsers().map(u => (
-                      <button
-                        key={u.id}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          console.log('Selecting user:', u.name, u.id);
-                          setSelectedUser(u.id);
-                          setUserDropdownOpen(false);
-                        }}
-                        className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${selectedUser === u.id ? 'bg-blue-50 text-blue-700' : 'text-gray-700'}`}
-                      >
-                        <div className="font-medium">{u.name}</div>
-                        <div className="text-xs text-gray-500">{u.email} • {u.role}</div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
+            <UserFilterDropdown
+              selectedUser={selectedUser || ''}
+              onSelect={(id) => {
+                console.log('Selecting user (Pipeline):', id);
+                setSelectedUser(id);
+              }}
+              availableUsers={getAvailableUsers()}
+              getUserName={getUserName}
+              showAllOption={user?.role === 'admin' || user?.role === 'sales_manager'}
+            />
           )}
           <div className="text-sm text-gray-600">Total Deals: {deals.length}</div>
           <div className="text-sm text-gray-600">Total Value: {formatCurrency(deals.reduce((s, d) => s + (d.dealValue || 0), 0))}</div>

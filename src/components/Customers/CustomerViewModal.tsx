@@ -111,10 +111,10 @@ export const CustomerViewModal: React.FC<CustomerViewModalProps> = ({
                 <div className="mt-1 flex items-center">
                   <Mail className="h-3 w-3 mr-1 text-gray-400" />
                   <a 
-                    href={`mailto:${customer.emailAddress || customer.contactEmail}`}
+                    href={`mailto:${customer.emailAddress}`}
                     className="text-sm text-blue-600 hover:text-blue-800"
                   >
-                    {customer.emailAddress || customer.contactEmail || 'Not provided'}
+                    {customer.emailAddress || 'Not provided'}
                   </a>
                 </div>
               </div>
@@ -123,10 +123,10 @@ export const CustomerViewModal: React.FC<CustomerViewModalProps> = ({
                 <div className="mt-1 flex items-center">
                   <Phone className="h-3 w-3 mr-1 text-gray-400" />
                   <a 
-                    href={`tel:${customer.phoneNumber || customer.contactPhone}`}
+                    href={`tel:${customer.phoneNumber}`}
                     className="text-sm text-blue-600 hover:text-blue-800"
                   >
-                    {customer.phoneNumber || customer.contactPhone || 'Not provided'}
+                    {customer.phoneNumber || 'Not provided'}
                   </a>
                 </div>
               </div>

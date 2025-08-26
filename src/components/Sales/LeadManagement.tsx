@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Filter, Eye, Phone, Mail, User, Building, X, ChevronDown } from 'lucide-react';
+import { Plus, Search, Filter, Eye, Phone, Mail, User, Building, X } from 'lucide-react';
 import { Customer } from '../../types';
 import { useLeads } from '../../hooks/useLeads';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUsers } from '../../hooks/useUsers';
+import UserFilterDropdown from '../Shared/UserFilterDropdown';
 
 interface LeadManagementProps {
   onViewLead: (lead: Customer) => void;
@@ -18,6 +19,7 @@ export const LeadManagement: React.FC<LeadManagementProps> = ({
 }) => {
   const { user } = useAuth();
   const { leads, loading: leadsLoading, error, setFilterUserId } = useLeads();
+
   const { loading: usersLoading, getAvailableUsers, getUserName } = useUsers();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -26,7 +28,11 @@ export const LeadManagement: React.FC<LeadManagementProps> = ({
   const [selectedLead, setSelectedLead] = useState<Customer | null>(null);
   const [showDialog, setShowDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState<string>('');
-  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  // Using shared dropdown with internal open state
+  const [sortBy, setSortBy] = useState<'companyName' | 'contactName' | 'createdAt'>('createdAt');
+  // Pagination
+  const [page, setPage] = useState<number>(1);
+  const pageSize = 10;
 
   // Initialize selectedUser when user is available
   useEffect(() => {
@@ -56,45 +62,44 @@ export const LeadManagement: React.FC<LeadManagementProps> = ({
     }
   }, [user, selectedUser, setFilterUserId]);
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (userDropdownOpen) {
-        const target = event.target as Element;
-        // Check if the click is outside the dropdown container
-        if (!target.closest('.user-dropdown-container')) {
-          setUserDropdownOpen(false);
-        }
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [userDropdownOpen]);
-
-  const getSelectedUserName = () => {
-    if (selectedUser === 'all') {
-      return 'All Users';
-    }
-    const userName = getUserName(selectedUser);
-    console.log('Getting selected user name:', { selectedUser, userName, availableUsers: getAvailableUsers().length });
-    return userName || 'Select User';
-  };
+  // User name resolved by shared component via getUserName
 
   const filteredLeads = leads.filter(lead => {
     const matchesSearch = 
       lead.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lead.contactName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (lead.contactEmail || lead.emailAddress || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (lead.phoneNumber || lead.phoneNumber || '').toLowerCase().includes(searchTerm.toLowerCase());
+      (lead.contactName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (lead.emailAddress || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (lead.phoneNumber || '').toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = statusFilter === 'all' || lead.status === statusFilter;
     const matchesSource = sourceFilter === 'all' || lead.source === sourceFilter;
     
     return matchesSearch && matchesStatus && matchesSource;
   });
+
+  const sortedLeads = React.useMemo(() => {
+    const list = [...filteredLeads];
+    if (sortBy === 'companyName') {
+      list.sort((a, b) => a.companyName.localeCompare(b.companyName));
+    } else if (sortBy === 'contactName') {
+      list.sort((a, b) => (a.contactName || '').localeCompare(b.contactName || ''));
+    } else {
+      // createdAt descending (newest first)
+      list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    }
+    return list;
+  }, [filteredLeads, sortBy]);
+
+  // Reset to first page when inputs change
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm, statusFilter, sourceFilter, sortBy, selectedUser]);
+
+  const totalPages = Math.max(1, Math.ceil(sortedLeads.length / pageSize));
+  const paginatedLeads = React.useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return sortedLeads.slice(start, start + pageSize);
+  }, [sortedLeads, page]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -162,57 +167,16 @@ export const LeadManagement: React.FC<LeadManagementProps> = ({
         </div>
         <div className="flex items-center space-x-4">
           {getAvailableUsers().length > 1 && (
-            <div className="flex items-center space-x-2 relative user-dropdown-container">
-              <Filter className="h-4 w-4 text-gray-500" />
-              <div className="relative">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setUserDropdownOpen(!userDropdownOpen);
-                  }}
-                  className="flex items-center space-x-2 px-3 py-1 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50 focus:ring-2 focus:ring-brand focus:border-transparent"
-                >
-                  <span>{getSelectedUserName()}</span>
-                  <ChevronDown className="h-3 w-3 text-gray-400" />
-                </button>
-                {userDropdownOpen && (
-                  <div className="absolute z-10 top-full mt-1 w-48 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
-                    {(user?.role === 'admin' || user?.role === 'sales_manager') && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          console.log('Selecting All Users');
-                          setSelectedUser('all');
-                          setUserDropdownOpen(false);
-                        }}
-                        className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${selectedUser === 'all' ? 'bg-blue-50 text-blue-700' : 'text-gray-700'}`}
-                      >
-                        <div className="font-medium">All Users</div>
-                        <div className="text-xs text-gray-500">View leads from all team members</div>
-                      </button>
-                    )}
-                    {(user?.role === 'admin' || user?.role === 'sales_manager') && getAvailableUsers().length > 0 && (
-                      <div className="border-t border-gray-200 my-1"></div>
-                    )}
-                    {getAvailableUsers().map(u => (
-                      <button
-                        key={u.id}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          console.log('Selecting user:', u.name, u.id);
-                          setSelectedUser(u.id);
-                          setUserDropdownOpen(false);
-                        }}
-                        className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${selectedUser === u.id ? 'bg-blue-50 text-blue-700' : 'text-gray-700'}`}
-                      >
-                        <div className="font-medium">{u.name}</div>
-                        <div className="text-xs text-gray-500">{u.email} • {u.role}</div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
+            <UserFilterDropdown
+              selectedUser={selectedUser || ''}
+              onSelect={(id) => {
+                console.log('Selecting user (Leads):', id);
+                setSelectedUser(id);
+              }}
+              availableUsers={getAvailableUsers()}
+              getUserName={getUserName}
+              showAllOption={user?.role === 'admin' || user?.role === 'sales_manager'}
+            />
           )}
           <div className="text-sm text-gray-600">Total Leads: {leads.length}</div>
           <button 
@@ -239,6 +203,17 @@ export const LeadManagement: React.FC<LeadManagementProps> = ({
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
               />
             </div>
+          </div>
+          <div>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as 'companyName' | 'contactName' | 'createdAt')}
+              className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent text-sm"
+            >
+              <option value="companyName">Company Name (A–Z)</option>
+              <option value="contactName">Contact Name (A–Z)</option>
+              <option value="createdAt">Date Created (Newest)</option>
+            </select>
           </div>
           <button
             onClick={() => setShowFilters(!showFilters)}
@@ -316,7 +291,7 @@ export const LeadManagement: React.FC<LeadManagementProps> = ({
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredLeads.map((lead) => (
+              {paginatedLeads.map((lead) => (
                 <tr 
                   key={lead.id} 
                   className="hover:bg-gray-50 cursor-pointer"
@@ -338,7 +313,7 @@ export const LeadManagement: React.FC<LeadManagementProps> = ({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">{lead.contactName}</div>
-                    <div className="text-sm text-gray-500">{lead.contactEmail}</div>
+                    <div className="text-sm text-gray-500">{lead.emailAddress}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(lead.status || 'new')}`}>
@@ -346,7 +321,7 @@ export const LeadManagement: React.FC<LeadManagementProps> = ({
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {lead.contactPhone || (lead as any).phoneNumber || '-'}
+                    {lead.phoneNumber || '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {(lead as any).assignedToUserName || 'Unassigned'}
@@ -374,12 +349,58 @@ export const LeadManagement: React.FC<LeadManagementProps> = ({
           </table>
         </div>
         
-        {filteredLeads.length === 0 && (
+        {sortedLeads.length === 0 && (
           <div className="text-center py-8">
             <p className="text-gray-500">No leads found matching your criteria.</p>
           </div>
         )}
       </div>
+
+      {/* Pagination Controls */}
+      {sortedLeads.length > 0 && (
+        <div className="flex items-center justify-between mt-4">
+          <div className="text-sm text-gray-600">
+            {(() => {
+              const start = (page - 1) * pageSize + 1;
+              const end = Math.min(page * pageSize, sortedLeads.length);
+              return `Showing ${start}-${end} of ${sortedLeads.length}`;
+            })()}
+          </div>
+          <div className="inline-flex gap-2">
+            <button
+              className="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50 hover:bg-gray-50"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+            >
+              Previous
+            </button>
+            <div className="hidden md:flex items-center gap-1">
+              {Array.from({ length: totalPages }).slice(0, 7).map((_, idx) => {
+                const pageNum = idx + 1;
+                return (
+                  <button
+                    key={pageNum}
+                    className={`px-3 py-1 border rounded-md text-sm ${page === pageNum ? 'bg-brand text-white border-brand' : 'border-gray-300 hover:bg-gray-50'}`}
+                    onClick={() => setPage(pageNum)}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+              {totalPages > 7 && (
+                <span className="px-2 text-sm text-gray-500">…</span>
+              )}
+            </div>
+            <button
+              className="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50 hover:bg-gray-50"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page >= totalPages}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Lead Quick View Dialog - Simplified */}
       {showDialog && selectedLead && (
@@ -416,19 +437,19 @@ export const LeadManagement: React.FC<LeadManagementProps> = ({
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Email</label>
                     <a 
-                      href={`mailto:${selectedLead.contactEmail}`}
+                      href={`mailto:${selectedLead.emailAddress}`}
                       className="mt-1 text-sm text-blue-600 hover:text-blue-800"
                     >
-                      {selectedLead.contactEmail}
+                      {selectedLead.emailAddress}
                     </a>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Phone</label>
                     <a 
-                      href={`tel:${selectedLead.contactPhone}`}
+                      href={`tel:${selectedLead.phoneNumber}`}
                       className="mt-1 text-sm text-blue-600 hover:text-blue-800"
                     >
-                      {selectedLead.contactPhone}
+                      {selectedLead.phoneNumber}
                     </a>
                   </div>
                   <div>

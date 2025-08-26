@@ -33,7 +33,7 @@ export const CustomerLeadPicker: React.FC<CustomerLeadPickerProps> = ({
       return (
         customer.companyName.toLowerCase().includes(searchLower) ||
         customer.contactName?.toLowerCase().includes(searchLower) ||
-        customer.contactEmail?.toLowerCase().includes(searchLower) ||
+        customer.emailAddress?.toLowerCase().includes(searchLower) ||
         customer.phoneNumber?.toLowerCase().includes(searchLower) ||
         customer.customerType.toLowerCase().includes(searchLower)
       );
@@ -174,7 +174,7 @@ export const CustomerLeadPicker: React.FC<CustomerLeadPickerProps> = ({
                     </div>
                     <div className="text-xs text-gray-500 truncate">
                       {customer.contactName && `${customer.contactName} • `}
-                      {customer.contactEmail && `${customer.contactEmail} • `}
+                      {customer.emailAddress && `${customer.emailAddress} • `}
                       {getCustomerTypeLabel(customer)}
                     </div>
                   </div>

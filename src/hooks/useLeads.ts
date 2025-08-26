@@ -9,6 +9,10 @@ export const useLeads = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filterUserId, setFilterUserId] = useState<string | undefined>(undefined);
+  const [pageSize] = useState<number>(25);
+  const [cursor, setCursor] = useState<any | undefined>(undefined);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [loadingMore, setLoadingMore] = useState<boolean>(false);
 
   const loadLeads = async () => {
     if (!user?.id || !user?.role) return;
@@ -17,29 +21,22 @@ export const useLeads = () => {
     setError(null);
     
     try {
-      // Get all customers and filter for leads
-      let fetchedCustomers: Customer[];
-      
-      if (user.role === 'admin') {
-        fetchedCustomers = await customerService.getAllCustomers();
-      } else if (user.companyId) {
-        fetchedCustomers = await customerService.getAllCustomersForCompany(user.companyId);
-      } else {
-        fetchedCustomers = await customerService.getCustomers(user.id);
-      }
-      
-      // Filter to only leads
-      let leadsOnly = fetchedCustomers.filter(c => c.customerType === 'lead');
-      
-      // Apply user filter if specified
+      // Choose paginated query based on role and filters
+      let page;
       if (filterUserId) {
-        leadsOnly = leadsOnly.filter(lead => 
-          lead.assignedToUserId === filterUserId || 
-          lead.createdByUserId === filterUserId
-        );
+        // Filter by assigned user on the server
+        page = await customerService.getLeadsPageAssignedTo(filterUserId, pageSize);
+      } else if (user.role === 'admin') {
+        page = await customerService.getLeadsPageAll(pageSize);
+      } else if (user.companyId) {
+        page = await customerService.getLeadsPageForCompany(user.companyId, pageSize);
+      } else {
+        page = await customerService.getLeadsPageForUser(user.id, pageSize);
       }
-      
-      setLeads(leadsOnly);
+
+      setLeads(page.items);
+      setCursor(page.lastDoc);
+      setHasMore(!!page.lastDoc);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load leads');
       console.error('Error loading leads:', err);
@@ -49,9 +46,40 @@ export const useLeads = () => {
   };
 
   useEffect(() => {
+    // Reset pagination when user or filters change
+    setLeads([]);
+    setCursor(undefined);
+    setHasMore(true);
     loadLeads();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, user?.role, filterUserId]);
+
+  const loadMore = async () => {
+    if (!user?.id || !user?.role || !hasMore || loadingMore) return;
+    setLoadingMore(true);
+    setError(null);
+    try {
+      let page;
+      if (filterUserId) {
+        // Filter by assigned user on the server
+        page = await customerService.getLeadsPageAssignedTo(filterUserId, pageSize, cursor);
+      } else if (user.role === 'admin') {
+        page = await customerService.getLeadsPageAll(pageSize, cursor);
+      } else if (user.companyId) {
+        page = await customerService.getLeadsPageForCompany(user.companyId, pageSize, cursor);
+      } else {
+        page = await customerService.getLeadsPageForUser(user.id, pageSize, cursor);
+      }
+      setLeads(prev => [...prev, ...page.items]);
+      setCursor(page.lastDoc);
+      setHasMore(!!page.lastDoc);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load more leads');
+      console.error('Error loading more leads:', err);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   const addLead = async (leadData: Omit<Customer, 'id' | 'createdAt' | 'updatedAt'>) => {
     if (!user?.id) throw new Error('User not authenticated');
@@ -121,6 +149,9 @@ export const useLeads = () => {
     loading,
     error,
     setFilterUserId,
+    hasMore,
+    loadMore,
+    loadingMore,
     addLead,
     updateLead,
     deleteLead,
@@ -129,4 +160,4 @@ export const useLeads = () => {
     getLeadsBySource,
     refetch: loadLeads,
   };
-}; 
+};

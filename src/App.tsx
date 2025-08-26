@@ -31,7 +31,7 @@ import { useTasks } from './hooks/useTasks';
 import { useCommissions } from './hooks/useCommissions';
 import { useUsers } from './hooks/useUsers';
 import { Customer, Quote, Task } from './types';
-import { Filter, ChevronDown } from 'lucide-react';
+import UserFilterDropdown from './components/Shared/UserFilterDropdown';
 
 // Simple router to handle invitation acceptance
 const getRouteFromUrl = () => {
@@ -173,7 +173,9 @@ const AppContent: React.FC = () => {
   
   // User selector states for quotes
   const [selectedUser, setSelectedUser] = useState<string>('all');
-  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+
+  // User selector states for tasks
+  const [tasksSelectedUser, setTasksSelectedUser] = useState<string>('all');
 
 
   // Initialize selectedUser when user is available
@@ -188,6 +190,17 @@ const AppContent: React.FC = () => {
       }
     }
   }, [user?.id, user?.role, selectedUser]);
+
+  // Initialize tasksSelectedUser when user is available
+  useEffect(() => {
+    if (user?.id && !tasksSelectedUser) {
+      if (user.role === 'admin' || user.role === 'sales_manager') {
+        setTasksSelectedUser('all');
+      } else {
+        setTasksSelectedUser(user.id);
+      }
+    }
+  }, [user?.id, user?.role, tasksSelectedUser]);
 
   // Handle filtering based on selected user and role for quotes
   useEffect(() => {
@@ -213,23 +226,7 @@ const AppContent: React.FC = () => {
     }
   }, [selectedUser, setFilterUserId]);
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (userDropdownOpen) {
-        const target = event.target as Element;
-        // Check if the click is outside the dropdown container
-        if (!target.closest('.user-dropdown-container')) {
-          setUserDropdownOpen(false);
-        }
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [userDropdownOpen]);
+  // Removed dropdown open/close state and click-outside handler; handled internally by UserFilterDropdown
 
   // Ensure non-admins don't land on admin-only tabs (e.g., after role change or login)
   useEffect(() => {
@@ -238,14 +235,7 @@ const AppContent: React.FC = () => {
     }
   }, [user?.role, activeTab]);
 
-  const getSelectedUserName = () => {
-    if (selectedUser === 'all') {
-      return 'All Users';
-    }
-    const userName = getUserName(selectedUser);
-    console.log('Getting selected user name (Quotes):', { selectedUser, userName, availableUsers: getAvailableUsers().length });
-    return userName || 'Select User';
-  };
+  // Removed unused user name helpers after migrating to UserFilterDropdown
 
   // Now we can do conditional returns after all hooks have been called
 
@@ -399,57 +389,16 @@ const AppContent: React.FC = () => {
               </div>
               <div className="flex items-center space-x-4">
                 {getAvailableUsers().length > 1 && (
-                  <div className="flex items-center space-x-2 relative user-dropdown-container">
-                    <Filter className="h-4 w-4 text-gray-500" />
-                    <div className="relative">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setUserDropdownOpen(!userDropdownOpen);
-                        }}
-                        className="flex items-center space-x-2 px-3 py-1 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50 focus:ring-2 focus:ring-brand focus:border-transparent"
-                      >
-                        <span>{getSelectedUserName()}</span>
-                        <ChevronDown className="h-3 w-3 text-gray-400" />
-                      </button>
-                      {userDropdownOpen && (
-                        <div className="absolute z-10 top-full mt-1 w-48 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
-                          {(user?.role === 'admin' || user?.role === 'sales_manager') && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                console.log('Selecting All Users for quotes');
-                                setSelectedUser('all');
-                                setUserDropdownOpen(false);
-                              }}
-                              className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${selectedUser === 'all' ? 'bg-blue-50 text-blue-700' : 'text-gray-700'}`}
-                            >
-                              <div className="font-medium">All Users</div>
-                              <div className="text-xs text-gray-500">View quotes from all team members</div>
-                            </button>
-                          )}
-                          {(user?.role === 'admin' || user?.role === 'sales_manager') && getAvailableUsers().length > 0 && (
-                            <div className="border-t border-gray-200 my-1"></div>
-                          )}
-                          {getAvailableUsers().map(u => (
-                            <button
-                              key={u.id}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                console.log('Selecting user for quotes:', u.name, u.id);
-                                setSelectedUser(u.id);
-                                setUserDropdownOpen(false);
-                              }}
-                              className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 ${selectedUser === u.id ? 'bg-blue-50 text-blue-700' : 'text-gray-700'}`}
-                            >
-                              <div className="font-medium">{u.name}</div>
-                              <div className="text-xs text-gray-500">{u.email} • {u.role}</div>
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  <UserFilterDropdown
+                    selectedUser={selectedUser || ''}
+                    onSelect={(id) => {
+                      console.log('Selecting user for quotes:', id);
+                      setSelectedUser(id);
+                    }}
+                    availableUsers={getAvailableUsers()}
+                    getUserName={getUserName}
+                    showAllOption={user?.role === 'admin' || user?.role === 'sales_manager'}
+                  />
                 )}
                 <div className="text-sm text-gray-600">Total Quotes: {quotes.length}</div>
                 <button
@@ -508,19 +457,50 @@ const AppContent: React.FC = () => {
           </div>
         );
       case 'tasks':
-        return (
-          <TaskList
-            tasks={tasks}
-            onTaskSelect={(task) => {
-              setSelectedTask(task);
-              setShowTaskForm(true);
-            }}
-            onAddTask={() => {
-              setSelectedTask(null);
-              setShowTaskForm(true);
-            }}
-          />
-        );
+        // Filter tasks by selected user for admins/managers; non-admins see their own via useTasks()
+        {
+          const tasksForView = (user.role === 'admin' || user.role === 'sales_manager')
+            ? (tasksSelectedUser === 'all'
+                ? tasks
+                : tasks.filter(t => t.assignedToUserId === tasksSelectedUser || t.createdByUserId === tasksSelectedUser))
+            : tasks;
+
+          return (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900">Tasks</h2>
+                  <p className="text-gray-600">View and manage team tasks</p>
+                </div>
+                {(user.role === 'admin' || user.role === 'sales_manager') && getAvailableUsers().length > 0 && (
+                  <div className="flex items-center space-x-4">
+                    <UserFilterDropdown
+                      selectedUser={tasksSelectedUser || ''}
+                      onSelect={(id) => {
+                        setTasksSelectedUser(id);
+                      }}
+                      availableUsers={getAvailableUsers()}
+                      getUserName={getUserName}
+                      showAllOption
+                    />
+                  </div>
+                )}
+              </div>
+
+              <TaskList
+                tasks={tasksForView}
+                onTaskSelect={(task) => {
+                  setSelectedTask(task);
+                  setShowTaskForm(true);
+                }}
+                onAddTask={() => {
+                  setSelectedTask(null);
+                  setShowTaskForm(true);
+                }}
+              />
+            </div>
+          );
+        }
       case 'users':
         return user.role === 'admin' ? (
           <UserManagementPage />

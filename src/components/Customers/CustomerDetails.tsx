@@ -5,6 +5,7 @@ import { Customer, Quote, Task } from '../../types';
 import { useCustomers } from '../../hooks/useCustomers';
 import { useQuotes } from '../../hooks/useQuotes';
 import { useTasks } from '../../hooks/useTasks';
+import { buildUpdatedRecord } from '../../utils/customerLeadMappers';
 
 interface CustomerDetailsProps {
   customerId: string;
@@ -56,18 +57,7 @@ export const CustomerDetails: React.FC<CustomerDetailsProps> = ({
     if (!customer) return;
 
     try {
-      const updatedCustomer: Customer = {
-        ...customer,
-        companyName: formData.companyName,
-        contactName: formData.contactName,
-        emailAddress: formData.emailAddress,
-        phoneNumber: formData.phoneNumber,
-        address: formData.address,
-        notes: formData.notes,
-        industry: formData.industry,
-        updatedAt: new Date().toISOString()
-      };
-
+      const updatedCustomer: Customer = buildUpdatedRecord(customer, formData);
       await updateCustomer(customer.id, updatedCustomer);
       setCustomer(updatedCustomer);
     } catch (error) {

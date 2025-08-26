@@ -44,6 +44,8 @@ export interface Customer {
   notes: string;
   attachments: Attachment[];
   customerType: 'lead' | 'customer';
+  // Optional website for both leads and customers
+  website?: string;
   // Lead-specific fields (required when customerType === 'lead')
   displayId?: string;
   industry?: string;

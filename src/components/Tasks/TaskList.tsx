@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Plus, Clock, User, AlertCircle } from 'lucide-react';
+import { Search, Plus, Clock, User, AlertCircle, Building } from 'lucide-react';
 import { Task } from '../../types';
 
 interface TaskListProps {
@@ -14,8 +14,8 @@ export const TaskList: React.FC<TaskListProps> = ({
   onAddTask
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [priorityFilter, setPriorityFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('pending');
+  const [sortBy, setSortBy] = useState<'customerName' | 'dueDateAsc' | 'taskType'>('dueDateAsc');
 
   const filteredTasks = tasks.filter(task => {
     const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -24,9 +24,21 @@ export const TaskList: React.FC<TaskListProps> = ({
                          (task.customerName && task.customerName.toLowerCase().includes(searchTerm.toLowerCase()));
     
     const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
-    const matchesPriority = priorityFilter === 'all' || task.priority === priorityFilter;
     
-    return matchesSearch && matchesStatus && matchesPriority;
+    return matchesSearch && matchesStatus;
+  });
+
+  const sortedTasks = [...filteredTasks].sort((a, b) => {
+    if (sortBy === 'customerName') {
+      const an = (a.customerName || '').toLowerCase();
+      const bn = (b.customerName || '').toLowerCase();
+      return an.localeCompare(bn);
+    }
+    if (sortBy === 'taskType') {
+      return (a.taskType || '').localeCompare(b.taskType || '');
+    }
+    // default dueDateAsc
+    return new Date(a.dateDue).getTime() - new Date(b.dateDue).getTime();
   });
 
   const getStatusColor = (status: string) => {
@@ -107,28 +119,27 @@ export const TaskList: React.FC<TaskListProps> = ({
             </select>
 
             <select
-              value={priorityFilter}
-              onChange={(e) => setPriorityFilter(e.target.value)}
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
               className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
             >
-              <option value="all">All Priority</option>
-              <option value="high">High</option>
-              <option value="medium">Medium</option>
-              <option value="low">Low</option>
+              <option value="dueDateAsc">Sort by Due Date (asc)</option>
+              <option value="customerName">Sort by Customer Name</option>
+              <option value="taskType">Sort by Task Type</option>
             </select>
           </div>
         </div>
       </div>
 
       <div className="divide-y divide-gray-200">
-        {filteredTasks.length === 0 ? (
+        {sortedTasks.length === 0 ? (
           <div className="p-8 text-center">
             <div className="text-gray-400 mb-4">
-              {searchTerm || statusFilter !== 'all' || priorityFilter !== 'all' 
+              {searchTerm || statusFilter !== 'all' 
                 ? 'No tasks found matching your filters.' 
                 : 'No tasks yet.'}
             </div>
-            {!searchTerm && statusFilter === 'all' && priorityFilter === 'all' && (
+            {!searchTerm && statusFilter === 'all' && (
               <button
                 onClick={onAddTask}
                 className="text-brand hover:text-blue-600 font-medium"
@@ -138,7 +149,7 @@ export const TaskList: React.FC<TaskListProps> = ({
             )}
           </div>
         ) : (
-          filteredTasks.map((task) => (
+          sortedTasks.map((task) => (
             <div
               key={task.id}
               onClick={() => onTaskSelect(task)}
@@ -164,7 +175,7 @@ export const TaskList: React.FC<TaskListProps> = ({
                     </div>
                     {task.customerName && (
                       <div className="flex items-center space-x-1">
-                        <span>•</span>
+                        <Building className="h-4 w-4" />
                         <span>{task.customerName}</span>
                       </div>
                     )}
