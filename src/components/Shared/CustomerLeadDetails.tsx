@@ -157,7 +157,7 @@ export const CustomerLeadDetails: React.FC<CustomerLeadDetailsProps> = ({
               {!isEditing ? (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="flex items-center px-4 py-2 bg-[#4285F4] text-white rounded-md hover:bg-blue-600 transition-colors"
+                  className="flex items-center px-4 py-2 bg-brand text-white rounded-md hover:bg-blue-600 transition-colors"
                 >
                   <Edit className="h-4 w-4 mr-2" />
                   Edit {recordType === 'lead' ? 'Lead' : 'Customer'}
@@ -172,7 +172,7 @@ export const CustomerLeadDetails: React.FC<CustomerLeadDetailsProps> = ({
                   </button>
                   <button
                     onClick={handleSave}
-                    className="flex items-center px-4 py-2 bg-[#4285F4] text-white rounded-md hover:bg-blue-600 transition-colors"
+                    className="flex items-center px-4 py-2 bg-brand text-white rounded-md hover:bg-blue-600 transition-colors"
                   >
                     <Save className="h-4 w-4 mr-2" />
                     Save Changes
@@ -206,7 +206,7 @@ export const CustomerLeadDetails: React.FC<CustomerLeadDetailsProps> = ({
                       name="companyName"
                       value={formData.companyName}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
                       required={recordType === 'customer'}
                     />
                   ) : (
@@ -230,7 +230,7 @@ export const CustomerLeadDetails: React.FC<CustomerLeadDetailsProps> = ({
                         name="industry"
                         value={formData.industry}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
                       />
                     ) : (
                       <p className="text-sm text-gray-900">{(record as any).industry || 'Not specified'}</p>
@@ -245,7 +245,7 @@ export const CustomerLeadDetails: React.FC<CustomerLeadDetailsProps> = ({
                       name="website"
                       value={formData.website}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
                       placeholder="https://"
                     />
                   </div>
@@ -280,7 +280,7 @@ export const CustomerLeadDetails: React.FC<CustomerLeadDetailsProps> = ({
                           assignedToUserName: selectedUserName
                         }));
                       }}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent text-sm"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent text-sm"
                     >
                       <option value="unassigned">Unassigned</option>
                       {users.map((user) => (
@@ -305,7 +305,7 @@ export const CustomerLeadDetails: React.FC<CustomerLeadDetailsProps> = ({
                       name="address"
                       value={formData.address}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
                     />
                   ) : (
                     <p className="text-sm text-gray-900">{formData.address || 'Not specified'}</p>
@@ -331,7 +331,7 @@ export const CustomerLeadDetails: React.FC<CustomerLeadDetailsProps> = ({
                       name="contactName"
                       value={formData.contactName}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
                       required={recordType === 'customer'}
                     />
                   ) : (
@@ -346,7 +346,7 @@ export const CustomerLeadDetails: React.FC<CustomerLeadDetailsProps> = ({
                       name="emailAddress"
                       value={formData.emailAddress}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
                       required
                     />
                   ) : (
@@ -370,7 +370,7 @@ export const CustomerLeadDetails: React.FC<CustomerLeadDetailsProps> = ({
                       name="phoneNumber"
                       value={formData.phoneNumber}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
                       required={recordType === 'lead'}
                     />
                   ) : (
@@ -402,7 +402,7 @@ export const CustomerLeadDetails: React.FC<CustomerLeadDetailsProps> = ({
                       name="industry"
                       value={formData.industry}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
                       placeholder="e.g. Technology, Healthcare, Manufacturing"
                     />
                   ) : (
@@ -416,7 +416,7 @@ export const CustomerLeadDetails: React.FC<CustomerLeadDetailsProps> = ({
                       name="source"
                       value={formData.source}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
                     >
                       <option value="website">Website</option>
                       <option value="referral">Referral</option>
@@ -445,7 +445,7 @@ export const CustomerLeadDetails: React.FC<CustomerLeadDetailsProps> = ({
                   value={formData.notes}
                   onChange={handleInputChange}
                   rows={6}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
                   placeholder={`Add notes about this ${recordType}...`}
                 />
               ) : (
@@ -469,7 +469,7 @@ export const CustomerLeadDetails: React.FC<CustomerLeadDetailsProps> = ({
                 {onAddTask && (
                   <button
                     onClick={onAddTask}
-                    className="flex items-center text-sm text-[#4285F4] hover:text-blue-600"
+                    className="flex items-center text-sm text-brand hover:text-blue-600"
                   >
                     <Plus className="h-4 w-4 mr-1" />
                     Add Task
@@ -522,7 +522,7 @@ export const CustomerLeadDetails: React.FC<CustomerLeadDetailsProps> = ({
                   {onAddQuote && (
                     <button
                       onClick={onAddQuote}
-                      className="flex items-center text-sm text-[#4285F4] hover:text-blue-600"
+                      className="flex items-center text-sm text-brand hover:text-blue-600"
                     >
                       <Plus className="h-4 w-4 mr-1" />
                       Add Quote

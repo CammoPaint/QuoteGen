@@ -115,7 +115,7 @@ export const InvitationAcceptancePage: React.FC<InvitationAcceptancePageProps> =
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-[#4285F4] mx-auto mb-4" />
+          <Loader2 className="h-8 w-8 animate-spin text-brand mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Verifying Invitation</h2>
           <p className="text-gray-600">Please wait while we verify your invitation...</p>
         </div>
@@ -132,7 +132,7 @@ export const InvitationAcceptancePage: React.FC<InvitationAcceptancePageProps> =
           <p className="text-gray-600 mb-6">{error}</p>
           <button
             onClick={() => window.location.href = '/'}
-            className="bg-[#4285F4] text-white px-6 py-2 rounded-md hover:bg-blue-600 transition-colors"
+            className="bg-brand text-white px-6 py-2 rounded-md hover:bg-blue-600 transition-colors"
           >
             Go to Login
           </button>
@@ -150,7 +150,7 @@ export const InvitationAcceptancePage: React.FC<InvitationAcceptancePageProps> =
           <p className="text-gray-600 mb-4">
             Your account has been created successfully. You'll be redirected to the dashboard shortly.
           </p>
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#4285F4] mx-auto"></div>
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-brand mx-auto"></div>
         </div>
       </div>
     );
@@ -162,8 +162,7 @@ export const InvitationAcceptancePage: React.FC<InvitationAcceptancePageProps> =
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-gray-900">Accept Invitation</h2>
           <p className="text-gray-600 mt-2">
-            You've been invited to join Insytify CRM as a{' '}
-            <span className="font-medium text-[#4285F4]">{invitation?.role}</span>
+            You've been invited to join Insytify CRM. 
           </p>
           <p className="text-sm text-gray-500 mt-1">
             Invited by {invitation?.invitedByName}
@@ -201,7 +200,7 @@ export const InvitationAcceptancePage: React.FC<InvitationAcceptancePageProps> =
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
               placeholder="Enter your full name"
             />
           </div>
@@ -217,7 +216,7 @@ export const InvitationAcceptancePage: React.FC<InvitationAcceptancePageProps> =
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
                 placeholder="Create a password"
               />
               <button
@@ -241,7 +240,7 @@ export const InvitationAcceptancePage: React.FC<InvitationAcceptancePageProps> =
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
                 placeholder="Confirm your password"
               />
               <button
@@ -257,7 +256,7 @@ export const InvitationAcceptancePage: React.FC<InvitationAcceptancePageProps> =
           <button
             type="submit"
             disabled={submitting}
-            className="w-full bg-[#4285F4] text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:ring-2 focus:ring-[#4285F4] focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-brand text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:ring-2 focus:ring-brand focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitting ? (
               <div className="flex items-center justify-center">

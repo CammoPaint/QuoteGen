@@ -8,11 +8,14 @@ import { useUsers } from '../../hooks/useUsers';
 interface LeadManagementProps {
   onViewLead: (lead: Customer) => void;
   onViewLeadDetails: (lead: Customer) => void;
+  onAddCustomer: () => void;
 }
 
 export const LeadManagement: React.FC<LeadManagementProps> = ({
   onViewLead,
-  onViewLeadDetails }) => {
+  onViewLeadDetails,
+  onAddCustomer
+}) => {
   const { user } = useAuth();
   const { leads, loading: leadsLoading, error, setFilterUserId } = useLeads();
   const { loading: usersLoading, getAvailableUsers, getUserName } = useUsers();
@@ -84,7 +87,8 @@ export const LeadManagement: React.FC<LeadManagementProps> = ({
     const matchesSearch = 
       lead.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       lead.contactName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (lead.contactEmail || lead.emailAddress || '').toLowerCase().includes(searchTerm.toLowerCase());
+      (lead.contactEmail || lead.emailAddress || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (lead.phoneNumber || lead.phoneNumber || '').toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = statusFilter === 'all' || lead.status === statusFilter;
     const matchesSource = sourceFilter === 'all' || lead.source === sourceFilter;
@@ -135,7 +139,7 @@ export const LeadManagement: React.FC<LeadManagementProps> = ({
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4285F4]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand"></div>
       </div>
     );
   }
@@ -166,7 +170,7 @@ export const LeadManagement: React.FC<LeadManagementProps> = ({
                     e.stopPropagation();
                     setUserDropdownOpen(!userDropdownOpen);
                   }}
-                  className="flex items-center space-x-2 px-3 py-1 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50 focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                  className="flex items-center space-x-2 px-3 py-1 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50 focus:ring-2 focus:ring-brand focus:border-transparent"
                 >
                   <span>{getSelectedUserName()}</span>
                   <ChevronDown className="h-3 w-3 text-gray-400" />
@@ -211,7 +215,10 @@ export const LeadManagement: React.FC<LeadManagementProps> = ({
             </div>
           )}
           <div className="text-sm text-gray-600">Total Leads: {leads.length}</div>
-          <button className="flex items-center space-x-2 px-4 py-2 bg-[#4285F4] text-white rounded-md hover:bg-blue-600 transition-colors">
+          <button 
+            onClick={onAddCustomer}
+            className="flex items-center space-x-2 px-4 py-2 bg-brand text-white rounded-md hover:bg-blue-600 transition-colors"
+          >
             <Plus className="h-4 w-4" />
             <span>Add Lead</span>
           </button>
@@ -229,7 +236,7 @@ export const LeadManagement: React.FC<LeadManagementProps> = ({
                 placeholder="Search leads..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
               />
             </div>
           </div>
@@ -249,7 +256,7 @@ export const LeadManagement: React.FC<LeadManagementProps> = ({
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
               >
                 <option value="all">All Statuses</option>
                 <option value="new">New</option>
@@ -265,7 +272,7 @@ export const LeadManagement: React.FC<LeadManagementProps> = ({
               <select
                 value={sourceFilter}
                 onChange={(e) => setSourceFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
               >
                 <option value="all">All Sources</option>
                 <option value="website">Website</option>
@@ -326,9 +333,6 @@ export const LeadManagement: React.FC<LeadManagementProps> = ({
                         <div className="text-sm font-medium text-gray-900">
                           {lead.companyName}
                         </div>
-                        <div className="text-sm text-gray-500">
-                          #{lead.displayId}
-                        </div>
                       </div>
                     </div>
                   </td>
@@ -357,7 +361,7 @@ export const LeadManagement: React.FC<LeadManagementProps> = ({
                           e.stopPropagation();
                           handleViewLead(lead);
                         }}
-                        className="text-[#4285F4] hover:text-blue-600 transition-colors"
+                        className="text-brand hover:text-blue-600 transition-colors"
                         title="Quick view"
                       >
                         <Eye className="h-4 w-4" />
@@ -457,7 +461,7 @@ export const LeadManagement: React.FC<LeadManagementProps> = ({
                     handleCloseDialog();
                     onViewLeadDetails(selectedLead);
                   }}
-                  className="px-4 py-2 bg-[#4285F4] text-white rounded-md hover:bg-blue-600 transition-colors"
+                  className="px-4 py-2 bg-brand text-white rounded-md hover:bg-blue-600 transition-colors"
                 >
                   View Full Details
                 </button>

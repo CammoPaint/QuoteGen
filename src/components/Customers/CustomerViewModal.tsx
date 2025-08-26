@@ -268,7 +268,7 @@ export const CustomerViewModal: React.FC<CustomerViewModalProps> = ({
               </button>
               <button
                 onClick={() => onEdit(customer)}
-                className="px-4 py-2 bg-[#4285F4] text-white rounded-md hover:bg-blue-600 transition-colors"
+                className="px-4 py-2 bg-brand text-white rounded-md hover:bg-blue-600 transition-colors"
               >
                 Edit {customer.customerType === 'lead' ? 'Lead' : 'Customer'}
               </button>

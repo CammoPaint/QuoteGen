@@ -78,7 +78,7 @@ export const CommissionTracker: React.FC<CommissionTrackerProps> = ({
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4285F4]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand"></div>
       </div>
     );
   }
@@ -103,7 +103,7 @@ export const CommissionTracker: React.FC<CommissionTrackerProps> = ({
           <select
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+            className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
           >
             {Array.from({ length: 12 }, (_, i) => {
               const date = new Date();
@@ -240,7 +240,7 @@ export const CommissionTracker: React.FC<CommissionTrackerProps> = ({
                     <div className="flex items-center justify-end space-x-2">
                       <button
                         onClick={() => onViewCommission(commission)}
-                        className="text-[#4285F4] hover:text-blue-600 transition-colors"
+                        className="text-brand hover:text-blue-600 transition-colors"
                       >
                         View
                       </button>

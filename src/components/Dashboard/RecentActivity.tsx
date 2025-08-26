@@ -43,7 +43,7 @@ const activities: ActivityItem[] = [
 const getIcon = (type: string) => {
   switch (type) {
     case 'customer':
-      return <User className="h-4 w-4 text-[#4285F4]" />;
+      return <User className="h-4 w-4 text-brand" />;
     case 'quote':
       return <FileText className="h-4 w-4 text-[#34A853]" />;
     case 'task':

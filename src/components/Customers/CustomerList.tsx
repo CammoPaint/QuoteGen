@@ -35,7 +35,7 @@ export const CustomerList: React.FC<CustomerListProps> = ({
           </div>
           <button
             onClick={onAddCustomer}
-            className="flex items-center space-x-2 bg-[#4285F4] text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
+            className="flex items-center space-x-2 bg-brand text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
           >
             <Plus className="h-4 w-4" />
             <span>Add Customer</span>
@@ -49,7 +49,7 @@ export const CustomerList: React.FC<CustomerListProps> = ({
             placeholder="Search customers..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
           />
         </div>
       </div>
@@ -63,7 +63,7 @@ export const CustomerList: React.FC<CustomerListProps> = ({
             {!searchTerm && (
               <button
                 onClick={onAddCustomer}
-                className="text-[#4285F4] hover:text-blue-600 font-medium"
+                className="text-brand hover:text-blue-600 font-medium"
               >
                 Add your first customer
               </button>
@@ -88,7 +88,7 @@ export const CustomerList: React.FC<CustomerListProps> = ({
                         e.stopPropagation();
                         onCustomerSelect(customer);
                       }}
-                      className="p-1 text-gray-400 hover:text-[#4285F4] transition-colors"
+                      className="p-1 text-gray-400 hover:text-brand transition-colors"
                       title="Quick view"
                     >
                       <Eye className="h-4 w-4" />

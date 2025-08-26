@@ -18,63 +18,28 @@ export const useCustomers = () => {
     try {
       let fetchedCustomers: Customer[];
       
-      console.log('Loading customers for user:', { 
-        userId: user.id, 
-        userRole: user.role, 
-        companyId: user.companyId 
-      });
-      
       // Admin users can see all customers in the system
       if (user.role === 'admin') {
-        console.log('Admin user - fetching all customers');
-        fetchedCustomers = await customerService.getAllCustomers();
+        fetchedCustomers = await customerService.getAllCustomers({ excludeLeads: true });
       }
       // Users with companyId can see all customers in their company
       else if (user.companyId && user.companyId !== 'default-company') {
-        console.log('Company user - fetching customers for company:', user.companyId);
-        fetchedCustomers = await customerService.getAllCustomersForCompany(user.companyId);
+        fetchedCustomers = await customerService.getAllCustomersForCompany(user.companyId, { excludeLeads: true });
       }
       // For all other users, show all customers (since customers should be visible to everyone)
       else {
-        console.log('Standard user - fetching all customers (customers are shared)');
-        fetchedCustomers = await customerService.getAllCustomers();
+        fetchedCustomers = await customerService.getAllCustomers({ excludeLeads: true });
       }
       
-      console.log('Fetched customers before filtering:', fetchedCustomers.length);
-      
-      // Debug: Log the first few customers to see their structure
-      if (fetchedCustomers.length > 0) {
-        console.log('Sample customers:', fetchedCustomers.slice(0, 3).map(c => ({
-          id: c.id,
-          companyName: c.companyName,
-          customerType: (c as any).customerType,
-          userId: (c as any).userId,
-          companyId: (c as any).companyId
-        })));
-      }
-      
-      // Keep only non-leads. If the field is missing, treat as a regular customer for backward compatibility
-      const onlyCustomers = fetchedCustomers.filter(c => {
-        const isLead = (c as any).customerType === 'lead';
-        if (isLead) {
-          console.log('Filtering out lead:', c.companyName, c.id);
-        }
-        return !isLead;
-      });
-      
-      console.log('Customers after filtering out leads:', onlyCustomers.length);
-      setCustomers(onlyCustomers);
+      setCustomers(fetchedCustomers);
     } catch (err) {
       console.error('Error loading customers:', err);
       setError(err instanceof Error ? err.message : 'Failed to load customers');
       
       // Fallback: try to get at least some customers
       try {
-        console.log('Attempting fallback to get user-specific customers');
-        const fallbackCustomers = await customerService.getCustomers(user.id);
-        const fallbackOnlyCustomers = fallbackCustomers.filter(c => (c as any).customerType !== 'lead');
-        console.log('Fallback customers loaded:', fallbackOnlyCustomers.length);
-        setCustomers(fallbackOnlyCustomers);
+        const fallbackCustomers = await customerService.getCustomers(user.id, { excludeLeads: true });
+        setCustomers(fallbackCustomers);
       } catch (fallbackErr) {
         console.error('Fallback also failed:', fallbackErr);
       }

@@ -15,11 +15,22 @@ service cloud.firestore {
     
     // Invitations - only admin users can manage
     match /invitations/{invitationId} {
+      // Admins can fully manage invitations
       allow read, write: if request.auth != null && 
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
-      // Users can read their own invitation by email
+
+      // Users can read their own invitation by email (when authenticated)
       allow read: if request.auth != null && 
         resource.data.email == request.auth.token.email;
+
+      // Public acceptance flow: allow unauthenticated read of a single invitation
+      // when the document ID equals the secure token, it is still pending, and not expired.
+      // Note: expiresAt must be a Firestore Timestamp for the time comparison below.
+      allow read: if request.auth == null &&
+        resource.data.status == 'pending' &&
+        invitationId == resource.data.token &&
+        resource.data.expiresAt != null &&
+        request.time < resource.data.expiresAt;
     }
     
     // Customers - authenticated users can access templates

@@ -182,7 +182,7 @@ export const DealModal: React.FC<DealModalProps> = ({
                 onFocus={() => !defaultCustomerId && setCustomerDropdownOpen(true)}
                 placeholder={customersLoading ? 'Loading customers...' : 'Search customers...'}
                 disabled={!!defaultCustomerId}
-                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent ${defaultCustomerId ? 'bg-gray-100' : ''}`}
+                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent ${defaultCustomerId ? 'bg-gray-100' : ''}`}
               />
               {!defaultCustomerId && customerDropdownOpen && (
                 <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-56 overflow-auto">
@@ -222,7 +222,7 @@ export const DealModal: React.FC<DealModalProps> = ({
                 value={form.title}
                 onChange={(e) => setForm(v => ({ ...v, title: e.target.value }))}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
                 placeholder="ABC Plumbing - CRM App"
               />
             </div>
@@ -234,7 +234,7 @@ export const DealModal: React.FC<DealModalProps> = ({
               <input
                 value={form.contactName}
                 onChange={(e) => setForm(v => ({ ...v, contactName: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
               />
             </div>
             <div>
@@ -243,7 +243,7 @@ export const DealModal: React.FC<DealModalProps> = ({
                 type="email"
                 value={form.contactEmail}
                 onChange={(e) => setForm(v => ({ ...v, contactEmail: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
               />
             </div>
           </div>
@@ -257,7 +257,7 @@ export const DealModal: React.FC<DealModalProps> = ({
                 step="0.01"
                 value={form.dealValue ?? ''}
                 onChange={(e) => setForm(v => ({ ...v, dealValue: e.target.value === '' ? undefined : Number(e.target.value) }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
               />
             </div>
             <div>
@@ -265,7 +265,7 @@ export const DealModal: React.FC<DealModalProps> = ({
               <input
                 value={form.currency}
                 onChange={(e) => setForm(v => ({ ...v, currency: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
               />
             </div>
             <div>
@@ -274,7 +274,7 @@ export const DealModal: React.FC<DealModalProps> = ({
                 type="date"
                 value={form.expectedCloseDate ?? ''}
                 onChange={(e) => setForm(v => ({ ...v, expectedCloseDate: e.target.value || undefined }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
               />
             </div>
           </div>
@@ -285,7 +285,7 @@ export const DealModal: React.FC<DealModalProps> = ({
               rows={3}
               value={form.notes}
               onChange={(e) => setForm(v => ({ ...v, notes: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
               placeholder="Add any notes..."
             />
           </div>
@@ -314,7 +314,7 @@ export const DealModal: React.FC<DealModalProps> = ({
             <button
               type="submit"
               disabled={isSaving}
-              className="flex items-center space-x-2 px-4 py-2 bg-[#4285F4] text-white rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center space-x-2 px-4 py-2 bg-brand text-white rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Save className="h-4 w-4" />
               <span>{isSaving ? 'Saving…' : 'Save Deal'}</span>

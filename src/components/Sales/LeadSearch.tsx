@@ -500,7 +500,7 @@ export const LeadSearch: React.FC = () => {
                 value={locationInput}
                 onChange={(e) => setLocationInput(e.target.value)}
                 placeholder="e.g., Brooklyn, NY"
-                className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
               />
             </div>
           </div>
@@ -513,7 +513,7 @@ export const LeadSearch: React.FC = () => {
                 value={queryInput}
                 onChange={(e) => setQueryInput(e.target.value)}
                 placeholder="e.g., plumber or Northside Plumbing"
-                className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
               />
             </div>
           </div>
@@ -521,7 +521,7 @@ export const LeadSearch: React.FC = () => {
             <button
               onClick={searchPlaces}
               disabled={!apiKey || loading}
-              className="w-full inline-flex items-center justify-center space-x-2 px-4 py-2 bg-[#4285F4] text-white rounded-md hover:bg-blue-600 transition-colors disabled:opacity-50"
+              className="w-full inline-flex items-center justify-center space-x-2 px-4 py-2 bg-brand text-white rounded-md hover:bg-blue-600 transition-colors disabled:opacity-50"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
               <span>Search</span>
@@ -617,7 +617,7 @@ export const LeadSearch: React.FC = () => {
                           href={r.website} 
                           target="_blank" 
                           rel="noreferrer" 
-                          className={`hover:underline truncate ${r.imported ? 'text-gray-400' : 'text-[#4285F4]'}`}
+                          className={`hover:underline truncate ${r.imported ? 'text-gray-400' : 'text-brand'}`}
                         >
                           {r.website}
                         </a>

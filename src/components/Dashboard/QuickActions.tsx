@@ -11,7 +11,7 @@ export const QuickActions: React.FC<QuickActionProps> = ({ onAction }) => {
       id: 'new-customer',
       label: 'Add Customer',
       icon: <Users className="h-5 w-5" />,
-      color: 'bg-[#4285F4] hover:bg-blue-600'
+      color: 'bg-brand hover:bg-blue-600'
     },
     {
       id: 'new-quote',

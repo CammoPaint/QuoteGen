@@ -86,7 +86,7 @@ export const DashboardStats: React.FC = () => {
       <StatCard
         title="Total Customers & Leads"
         value={totalCustomers.toString()}
-        icon={<Users className="h-6 w-6 text-[#4285F4]" />}
+        icon={<Users className="h-6 w-6 text-brand" />}
         change="Real-time"
         trend="up"
       />

@@ -18,12 +18,23 @@ const COLLECTION_NAME = 'customers';
 
 export const customerService = {
   // Get all customers for a user or company
-  async getCustomers(userId: string): Promise<Customer[]> {
+  async getCustomers(userId: string, options?: { excludeLeads?: boolean }): Promise<Customer[]> {
     try {
+      const constraints: any[] = [
+        where('userId', '==', userId),
+      ];
+
+      // Exclude leads at the query level when requested
+      if (options?.excludeLeads) {
+        // Using equality keeps indexes simple and avoids inequality ordering constraints
+        constraints.push(where('customerType', '==', 'customer'));
+      }
+
+      constraints.push(orderBy('createdAt', 'desc'));
+
       const q = query(
         collection(db, COLLECTION_NAME),
-        where('userId', '==', userId),
-        orderBy('createdAt', 'desc')
+        ...constraints
       );
       
       const querySnapshot = await getDocs(q);
@@ -41,12 +52,21 @@ export const customerService = {
   },
 
   // Get all customers for a company (shows customers from all users in the company)
-  async getAllCustomersForCompany(companyId: string): Promise<Customer[]> {
+  async getAllCustomersForCompany(companyId: string, options?: { excludeLeads?: boolean }): Promise<Customer[]> {
     try {
+      const constraints: any[] = [
+        where('companyId', '==', companyId),
+      ];
+
+      if (options?.excludeLeads) {
+        constraints.push(where('customerType', '==', 'customer'));
+      }
+
+      constraints.push(orderBy('createdAt', 'desc'));
+
       const q = query(
         collection(db, COLLECTION_NAME),
-        where('companyId', '==', companyId),
-        orderBy('createdAt', 'desc')
+        ...constraints
       );
       
       const querySnapshot = await getDocs(q);
@@ -64,11 +84,19 @@ export const customerService = {
   },
 
   // Get absolutely all customers in the system (admin only)
-  async getAllCustomers(): Promise<Customer[]> {
+  async getAllCustomers(options?: { excludeLeads?: boolean }): Promise<Customer[]> {
     try {
+      const constraints: any[] = [];
+
+      if (options?.excludeLeads) {
+        constraints.push(where('customerType', '==', 'customer'));
+      }
+
+      constraints.push(orderBy('createdAt', 'desc'));
+
       const q = query(
         collection(db, COLLECTION_NAME),
-        orderBy('createdAt', 'desc')
+        ...constraints
       );
       
       const querySnapshot = await getDocs(q);

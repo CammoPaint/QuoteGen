@@ -75,7 +75,7 @@ export const TaskList: React.FC<TaskListProps> = ({
           <h2 className="text-xl font-semibold text-gray-900">Tasks</h2>
           <button
             onClick={onAddTask}
-            className="flex items-center space-x-2 bg-[#4285F4] text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
+            className="flex items-center space-x-2 bg-brand text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
           >
             <Plus className="h-4 w-4" />
             <span>Add Task</span>
@@ -90,7 +90,7 @@ export const TaskList: React.FC<TaskListProps> = ({
               placeholder="Search tasks..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
             />
           </div>
 
@@ -98,7 +98,7 @@ export const TaskList: React.FC<TaskListProps> = ({
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+              className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
             >
               <option value="all">All Status</option>
               <option value="pending">Pending</option>
@@ -109,7 +109,7 @@ export const TaskList: React.FC<TaskListProps> = ({
             <select
               value={priorityFilter}
               onChange={(e) => setPriorityFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+              className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
             >
               <option value="all">All Priority</option>
               <option value="high">High</option>
@@ -131,7 +131,7 @@ export const TaskList: React.FC<TaskListProps> = ({
             {!searchTerm && statusFilter === 'all' && priorityFilter === 'all' && (
               <button
                 onClick={onAddTask}
-                className="text-[#4285F4] hover:text-blue-600 font-medium"
+                className="text-brand hover:text-blue-600 font-medium"
               >
                 Create your first task
               </button>

@@ -80,7 +80,7 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({ onClose }) => 
               <h3 className="font-medium text-gray-900">Templates</h3>
               <button
                 onClick={handleCreateNew}
-                className="flex items-center space-x-1 px-3 py-1 text-sm bg-[#4285F4] text-white rounded-md hover:bg-blue-600 transition-colors"
+                className="flex items-center space-x-1 px-3 py-1 text-sm bg-brand text-white rounded-md hover:bg-blue-600 transition-colors"
               >
                 <Plus className="h-4 w-4" />
                 <span>New</span>
@@ -93,7 +93,7 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({ onClose }) => 
                   key={template.id}
                   className={`p-3 rounded-lg border cursor-pointer transition-colors ${
                     selectedTemplate.id === template.id
-                      ? 'border-[#4285F4] bg-blue-50'
+                      ? 'border-brand bg-blue-50'
                       : 'border-gray-200 hover:bg-gray-50'
                   }`}
                   onClick={() => setSelectedTemplate(template)}
@@ -155,7 +155,7 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({ onClose }) => 
                       <button
                         onClick={handleSave}
                         disabled={loading}
-                        className="flex items-center space-x-1 px-3 py-2 text-sm bg-[#4285F4] text-white rounded-md hover:bg-blue-600 transition-colors disabled:opacity-50"
+                        className="flex items-center space-x-1 px-3 py-2 text-sm bg-brand text-white rounded-md hover:bg-blue-600 transition-colors disabled:opacity-50"
                       >
                         <Save className="h-4 w-4" />
                         <span>Save</span>
@@ -183,7 +183,7 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({ onClose }) => 
                       type="text"
                       value={selectedTemplate.name}
                       onChange={(e) => handleFieldChange('name', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
                     />
                   ) : (
                     <p className="text-gray-900">{selectedTemplate.name}</p>
@@ -203,7 +203,7 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({ onClose }) => 
                           type="text"
                           value={selectedTemplate.companyInfo.name}
                           onChange={(e) => handleCompanyInfoChange('name', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
                         />
                       ) : (
                         <p className="text-gray-900">{selectedTemplate.companyInfo.name}</p>
@@ -219,7 +219,7 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({ onClose }) => 
                           type="text"
                           value={selectedTemplate.companyInfo.phone}
                           onChange={(e) => handleCompanyInfoChange('phone', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
                         />
                       ) : (
                         <p className="text-gray-900">{selectedTemplate.companyInfo.phone}</p>
@@ -235,7 +235,7 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({ onClose }) => 
                           type="email"
                           value={selectedTemplate.companyInfo.email}
                           onChange={(e) => handleCompanyInfoChange('email', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
                         />
                       ) : (
                         <p className="text-gray-900">{selectedTemplate.companyInfo.email}</p>
@@ -251,7 +251,7 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({ onClose }) => 
                           type="text"
                           value={selectedTemplate.companyInfo.website || ''}
                           onChange={(e) => handleCompanyInfoChange('website', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
                         />
                       ) : (
                         <p className="text-gray-900">{selectedTemplate.companyInfo.website || 'Not set'}</p>
@@ -267,7 +267,7 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({ onClose }) => 
                           value={selectedTemplate.companyInfo.address}
                           onChange={(e) => handleCompanyInfoChange('address', e.target.value)}
                           rows={2}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
                         />
                       ) : (
                         <p className="text-gray-900">{selectedTemplate.companyInfo.address}</p>
@@ -286,7 +286,7 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({ onClose }) => 
                       value={selectedTemplate.termsAndConditions}
                       onChange={(e) => handleFieldChange('termsAndConditions', e.target.value)}
                       rows={12}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent font-mono text-sm"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent font-mono text-sm"
                       placeholder="Enter terms and conditions..."
                     />
                   ) : (
@@ -308,7 +308,7 @@ export const TemplateManager: React.FC<TemplateManagerProps> = ({ onClose }) => 
                       value={selectedTemplate.footerText}
                       onChange={(e) => handleFieldChange('footerText', e.target.value)}
                       rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
                       placeholder="Enter footer text..."
                     />
                   ) : (

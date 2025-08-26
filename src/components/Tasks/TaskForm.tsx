@@ -154,7 +154,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
               value={formData.title}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
               placeholder="Enter task title"
             />
           </div>
@@ -170,7 +170,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
               onChange={handleChange}
               required
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
               placeholder="Describe the task..."
             />
           </div>
@@ -185,7 +185,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                 name="taskType"
                 value={formData.taskType}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
               >
                 <option value="email">Email</option>
                 <option value="phone">Phone Call</option>
@@ -205,7 +205,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                 value={formData.dateDue}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
               />
             </div>
           </div>
@@ -222,7 +222,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                   name="assignedToUserId"
                   value={formData.assignedToUserId}
                   onChange={(e) => handleUserAssignment(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                  className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
                   required
                 >
                   <option value="">Select user...</option>
@@ -244,7 +244,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
               >
                 <option value="pending">Pending</option>
                 <option value="in-progress">In Progress</option>
@@ -279,7 +279,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
               </button>
               <button
                 type="submit"
-                className="flex items-center space-x-2 px-4 py-2 bg-[#4285F4] text-white rounded-md hover:bg-blue-600 transition-colors"
+                className="flex items-center space-x-2 px-4 py-2 bg-brand text-white rounded-md hover:bg-blue-600 transition-colors"
               >
                 <Save className="h-4 w-4" />
                 <span>{task ? 'Update' : 'Create'} Task</span>

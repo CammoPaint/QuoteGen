@@ -77,7 +77,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ userRole }) => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
                     isActive
-                      ? 'bg-[#4285F4] text-white'
+                      ? 'bg-brand text-white'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >

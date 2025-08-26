@@ -55,7 +55,7 @@ export const QuoteGenerator: React.FC<QuoteGeneratorProps> = ({
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center space-x-2">
-            <Bot className="h-6 w-6 text-[#4285F4]" />
+            <Bot className="h-6 w-6 text-brand" />
             <h2 className="text-xl font-semibold text-gray-900">AI Quote Generator</h2>
           </div>
           <button
@@ -75,7 +75,7 @@ export const QuoteGenerator: React.FC<QuoteGeneratorProps> = ({
               id="customer"
               value={selectedCustomerId}
               onChange={(e) => setSelectedCustomerId(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
               required
             >
               <option value="">Choose a customer...</option>
@@ -96,7 +96,7 @@ export const QuoteGenerator: React.FC<QuoteGeneratorProps> = ({
               value={projectDescription}
               onChange={(e) => setProjectDescription(e.target.value)}
               rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
               placeholder="Describe the project requirements, features, and any specific needs..."
               required
             />
@@ -114,7 +114,7 @@ export const QuoteGenerator: React.FC<QuoteGeneratorProps> = ({
                 value={hourlyRate}
                 onChange={(e) => setHourlyRate(Number(e.target.value))}
                 min="1"
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
               />
             </div>
             <p className="text-sm text-gray-500 mt-1">Default: $50/hour</p>
@@ -122,7 +122,7 @@ export const QuoteGenerator: React.FC<QuoteGeneratorProps> = ({
 
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <div className="flex items-start space-x-2">
-              <Bot className="h-5 w-5 text-[#4285F4] mt-0.5" />
+              <Bot className="h-5 w-5 text-brand mt-0.5" />
               <div>
                 <h4 className="text-sm font-medium text-blue-900">AI-Powered Quote Generation</h4>
                 <p className="text-sm text-blue-700 mt-1">
@@ -143,7 +143,7 @@ export const QuoteGenerator: React.FC<QuoteGeneratorProps> = ({
             <button
               onClick={handleGenerate}
               disabled={!selectedCustomerId || !projectDescription.trim() || isGenerating}
-              className="flex items-center space-x-2 px-4 py-2 bg-[#4285F4] text-white rounded-md hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center space-x-2 px-4 py-2 bg-brand text-white rounded-md hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isGenerating ? (
                 <>

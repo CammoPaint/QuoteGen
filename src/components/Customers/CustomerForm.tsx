@@ -4,12 +4,14 @@ import { Customer } from '../../types';
 
 interface CustomerFormProps {
   customer?: Customer;
+  initialType?: 'customer' | 'lead';
   onSave: (customer: Omit<Customer, 'id' | 'createdAt' | 'updatedAt'>) => void;
   onCancel: () => void;
 }
 
 export const CustomerForm: React.FC<CustomerFormProps> = ({
   customer,
+  initialType = 'customer',
   onSave,
   onCancel
 }) => {
@@ -20,7 +22,7 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({
     phoneNumber: customer?.phoneNumber || '',
     emailAddress: customer?.emailAddress || '',
     notes: customer?.notes || '',
-    customerType: customer?.customerType || 'customer',
+    customerType: customer?.customerType || initialType,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -44,7 +46,13 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900">
-            {customer ? 'Edit Customer' : 'Add New Customer'}
+            {formData.customerType === 'lead'
+              ? customer
+                ? 'Edit Lead'
+                : 'Add New Lead'
+              : customer
+                ? 'Edit Customer'
+                : 'Add New Customer'}
           </h2>
           <button
             onClick={onCancel}
@@ -65,7 +73,7 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({
               value={formData.customerType}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent bg-white"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent bg-white"
             >
               <option value="customer">Customer</option>
               <option value="lead">Lead</option>
@@ -88,7 +96,7 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({
                 value={formData.companyName}
                 onChange={handleChange}
                 required={formData.customerType === 'customer'}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
               />
             </div>
 
@@ -103,7 +111,7 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({
                 value={formData.contactName}
                 onChange={handleChange}
                 required={formData.customerType === 'customer'}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
               />
             </div>
           </div>
@@ -118,7 +126,7 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({
               name="address"
               value={formData.address}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
             />
           </div>
 
@@ -134,7 +142,7 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({
                 value={formData.phoneNumber}
                 onChange={handleChange}
                 required={formData.customerType === 'lead'}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
               />
             </div>
 
@@ -149,7 +157,7 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({
                 value={formData.emailAddress}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
               />
             </div>
           </div>
@@ -164,7 +172,7 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({
               rows={4}
               value={formData.notes}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
               placeholder="Add any additional notes about this customer..."
             />
           </div>
@@ -179,10 +187,9 @@ export const CustomerForm: React.FC<CustomerFormProps> = ({
             </button>
             <button
               type="submit"
-              className="flex items-center space-x-2 px-4 py-2 bg-[#4285F4] text-white rounded-md hover:bg-blue-600 transition-colors"
+              className="flex items-center space-x-2 px-4 py-2 bg-brand text-white rounded-md hover:bg-blue-600 transition-colors"
             >
-              <Save className="h-4 w-4" />
-              <span>{customer ? 'Update' : 'Save'} Customer</span>
+              <span>{customer ? 'Update' : 'Create'}</span>
             </button>
           </div>
         </form>

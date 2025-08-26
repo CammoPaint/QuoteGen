@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ForgotPassword from './ForgotPassword';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -11,6 +12,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [showForgot, setShowForgot] = useState(false);
   const { signIn, signInWithGoogle, signInWithMicrosoft, loading } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -58,7 +60,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+  <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
               Email
@@ -71,7 +73,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent transition-colors"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent transition-colors"
                 placeholder="Enter your email"
               />
             </div>
@@ -89,7 +91,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent transition-colors"
+                className="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent transition-colors"
                 placeholder="Enter your password"
               />
               <button
@@ -100,12 +102,21 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
               </button>
             </div>
+            <div className="mt-2 text-right">
+              <button
+                type="button"
+                className="text-sm text-blue-600 hover:underline focus:outline-none"
+                onClick={() => setShowForgot(true)}
+              >
+                Forgot password?
+              </button>
+            </div>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#4285F4] text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:ring-2 focus:ring-[#4285F4] focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-brand text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:ring-2 focus:ring-brand focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
@@ -126,7 +137,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
             <button
               onClick={handleGoogleSignIn}
               disabled={loading}
-              className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#4285F4] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -140,7 +151,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
             <button
               onClick={handleMicrosoftSignIn}
               disabled={loading}
-              className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#4285F4] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path fill="#F25022" d="M11.4 11.4H0V0h11.4v11.4z"/>
@@ -159,7 +170,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
             Don't have an account?{' '}
             <button
               onClick={onToggleMode}
-              className="font-medium text-[#4285F4] hover:text-blue-600 focus:outline-none focus:underline"
+              className="font-medium text-brand hover:text-blue-600 focus:outline-none focus:underline"
             >
               Sign up
             </button>
@@ -167,6 +178,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
         </div>
         */}
       </div>
+      {showForgot && <ForgotPassword onClose={() => setShowForgot(false)} />}
     </div>
   );
 };

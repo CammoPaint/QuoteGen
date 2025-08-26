@@ -181,7 +181,7 @@ export const UserManagementPage: React.FC<UserManagementPageProps> = ({ onClose:
             </div>
             <button
               onClick={() => setShowInviteForm(true)}
-              className="flex items-center space-x-2 bg-[#4285F4] text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
+              className="flex items-center space-x-2 bg-brand text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
             >
               <Plus className="h-4 w-4" />
               <span>Invite User</span>
@@ -207,7 +207,7 @@ export const UserManagementPage: React.FC<UserManagementPageProps> = ({ onClose:
           <h3 className="text-lg font-medium text-gray-900 mb-4">Active Users</h3>
           {usersLoading ? (
             <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4285F4]"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand"></div>
             </div>
           ) : (
             <div className="space-y-4">
@@ -268,7 +268,7 @@ export const UserManagementPage: React.FC<UserManagementPageProps> = ({ onClose:
             <h3 className="text-lg font-medium text-gray-900 mb-4">Pending Invitations</h3>
             {invitationsLoading ? (
               <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4285F4]"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand"></div>
               </div>
             ) : pendingInvitations.length === 0 ? (
               <div className="text-center py-8">
@@ -468,7 +468,7 @@ export const UserManagementPage: React.FC<UserManagementPageProps> = ({ onClose:
                   type="button"
                   onClick={confirmResendInvitation}
                   disabled={loading}
-                  className="flex items-center space-x-2 px-4 py-2 bg-[#4285F4] text-white rounded-md hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center space-x-2 px-4 py-2 bg-brand text-white rounded-md hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <>
@@ -506,7 +506,7 @@ export const UserManagementPage: React.FC<UserManagementPageProps> = ({ onClose:
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
                   placeholder="user@company.com"
                 />
               </div>
@@ -519,7 +519,7 @@ export const UserManagementPage: React.FC<UserManagementPageProps> = ({ onClose:
                   id="role"
                   value={inviteRole}
                   onChange={(e) => setInviteRole(e.target.value as 'admin' | 'standard')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
                 >
                   <option value="standard">Standard User</option>
                   <option value="admin">Admin</option>
@@ -545,7 +545,7 @@ export const UserManagementPage: React.FC<UserManagementPageProps> = ({ onClose:
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex items-center space-x-2 px-4 py-2 bg-[#4285F4] text-white rounded-md hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center space-x-2 px-4 py-2 bg-brand text-white rounded-md hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <>

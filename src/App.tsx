@@ -111,7 +111,7 @@ const QuoteViewerWrapper: React.FC<QuoteViewerWrapperProps> = ({
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4285F4]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand"></div>
         <p className="ml-4 text-gray-600">Loading customer information...</p>
       </div>
     );
@@ -129,12 +129,28 @@ const QuoteViewerWrapper: React.FC<QuoteViewerWrapperProps> = ({
 };
 
 const AppContent: React.FC = () => {
+  // Early route check: if accepting an invitation, avoid loading any app data hooks
+  const currentRoute = getRouteFromUrl();
+  if (currentRoute.route === 'accept-invitation' && currentRoute.token) {
+    const handleInvitationAccepted = () => {
+      // Return to app root after acceptance
+      window.history.replaceState({}, '', '/');
+      window.location.reload();
+    };
+    return (
+      <InvitationAcceptancePage
+        token={currentRoute.token}
+        onAcceptComplete={handleInvitationAccepted}
+      />
+    );
+  }
+
   const { user, loading } = useAuth();
   
   // All hooks must be called before any conditional returns
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showLogin, setShowLogin] = useState(true);
-  const [route, setRoute] = useState(getRouteFromUrl());
+
   
   // Firestore hooks for data management
   const { customers, addCustomer, updateCustomer } = useCustomers();
@@ -145,6 +161,7 @@ const AppContent: React.FC = () => {
   
   // Modal states
   const [showCustomerForm, setShowCustomerForm] = useState(false);
+  const [customerFormType, setCustomerFormType] = useState<'customer' | 'lead'>('customer');
   const [showQuoteGenerator, setShowQuoteGenerator] = useState(false);
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
@@ -158,15 +175,6 @@ const AppContent: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<string>('all');
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
-  // Handle route changes
-  React.useEffect(() => {
-    const handlePopState = () => {
-      setRoute(getRouteFromUrl());
-    };
-    
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
 
   // Initialize selectedUser when user is available
   useEffect(() => {
@@ -245,27 +253,10 @@ const AppContent: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4285F4] mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading...</p>
         </div>
       </div>
-    );
-  }
-
-  // Handle invitation acceptance completion
-  const handleInvitationAccepted = () => {
-    // Clear the URL and redirect to main app
-    window.history.replaceState({}, '', '/');
-    setRoute({ route: 'app', token: null });
-  };
-
-  // Handle invitation acceptance route
-  if (route.route === 'accept-invitation' && route.token) {
-    return (
-      <InvitationAcceptancePage
-        token={route.token}
-        onAcceptComplete={handleInvitationAccepted}
-      />
     );
   }
 
@@ -377,10 +368,12 @@ const AppContent: React.FC = () => {
             customers={customers}
             onCustomerSelect={(customer) => {
               setSelectedCustomer(customer);
+              setCustomerFormType('customer');
               setShowCustomerForm(true);
             }}
             onAddCustomer={() => {
               setSelectedCustomer(null);
+              setCustomerFormType('customer');
               setShowCustomerForm(true);
             }}
             onCustomerDetails={(customer) => {
@@ -414,7 +407,7 @@ const AppContent: React.FC = () => {
                           e.stopPropagation();
                           setUserDropdownOpen(!userDropdownOpen);
                         }}
-                        className="flex items-center space-x-2 px-3 py-1 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50 focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                        className="flex items-center space-x-2 px-3 py-1 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50 focus:ring-2 focus:ring-brand focus:border-transparent"
                       >
                         <span>{getSelectedUserName()}</span>
                         <ChevronDown className="h-3 w-3 text-gray-400" />
@@ -461,7 +454,7 @@ const AppContent: React.FC = () => {
                 <div className="text-sm text-gray-600">Total Quotes: {quotes.length}</div>
                 <button
                   onClick={() => setShowQuoteGenerator(true)}
-                  className="bg-[#4285F4] text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
+                  className="bg-brand text-white px-4 py-2 rounded-md hover:bg-brand-dark transition-colors"
                 >
                   Generate Quote
                 </button>
@@ -469,7 +462,7 @@ const AppContent: React.FC = () => {
             </div>
             {quotesLoading || usersLoading ? (
               <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4285F4] mx-auto"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand mx-auto"></div>
                 <p className="mt-2 text-gray-600">Loading quotes...</p>
               </div>
             ) : (
@@ -563,6 +556,11 @@ const AppContent: React.FC = () => {
         return (
           <LeadManagement
             onViewLead={() => {}}
+            onAddCustomer={() => {
+              setSelectedCustomer(null);
+              setCustomerFormType('lead');
+              setShowCustomerForm(true);
+            }}
             onViewLeadDetails={(lead) => {
               setSelectedLeadId(lead.id);
               setActiveTab('lead-details');
@@ -658,6 +656,7 @@ const AppContent: React.FC = () => {
       {showCustomerForm && (
         <CustomerForm
           customer={selectedCustomer || undefined}
+          initialType={customerFormType}
           onSave={handleSaveCustomer}
           onCancel={() => {
             setShowCustomerForm(false);

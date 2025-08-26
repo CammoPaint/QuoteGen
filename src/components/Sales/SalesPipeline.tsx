@@ -182,7 +182,7 @@ export const SalesPipeline: React.FC<SalesPipelineProps> = ({ onEditDeal: _ }) =
   if (dealsLoading || usersLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4285F4]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand"></div>
       </div>
     );
   }
@@ -213,7 +213,7 @@ export const SalesPipeline: React.FC<SalesPipelineProps> = ({ onEditDeal: _ }) =
                     e.stopPropagation();
                     setUserDropdownOpen(!userDropdownOpen);
                   }}
-                  className="flex items-center space-x-2 px-3 py-1 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50 focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                  className="flex items-center space-x-2 px-3 py-1 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50 focus:ring-2 focus:ring-brand focus:border-transparent"
                 >
                   <span>{getSelectedUserName()}</span>
                   <ChevronDown className="h-3 w-3 text-gray-400" />
@@ -262,7 +262,7 @@ export const SalesPipeline: React.FC<SalesPipelineProps> = ({ onEditDeal: _ }) =
           <button
             type="button"
             onClick={() => setIsCreateOpen(true)}
-            className="flex items-center space-x-2 px-4 py-2 bg-[#4285F4] text-white rounded-md hover:bg-blue-600"
+            className="flex items-center space-x-2 px-4 py-2 bg-brand text-white rounded-md hover:bg-blue-600"
           >
             <Plus className="h-4 w-4" />
             <span>Add New Deal</span>
@@ -275,7 +275,7 @@ export const SalesPipeline: React.FC<SalesPipelineProps> = ({ onEditDeal: _ }) =
         {columns.map((stage) => (
           <div
             key={stage.id}
-            className={`bg-gray-50 rounded-lg p-4 min-h-[600px] transition-all ${dragOverStageId === stage.id ? 'ring-2 ring-[#4285F4] bg-blue-50/40' : ''}`}
+            className={`bg-gray-50 rounded-lg p-4 min-h-[600px] transition-all ${dragOverStageId === stage.id ? 'ring-2 ring-brand bg-blue-50/40' : ''}`}
             onDragOver={(e) => handleDragOver(e, stage.id)}
             onDrop={(e) => handleDrop(e, stage.id)}
             onDragEnter={() => setDragOverStageId(stage.id)}
@@ -306,7 +306,7 @@ export const SalesPipeline: React.FC<SalesPipelineProps> = ({ onEditDeal: _ }) =
                 <div
                   key={deal.id}
                   className={`bg-white rounded-lg p-3 shadow-sm border border-gray-200 cursor-move hover:shadow-md transition-all ${
-                    draggedDeal?.id === deal.id ? 'opacity-70 ring-2 ring-[#4285F4] scale-[.98]' : ''
+                    draggedDeal?.id === deal.id ? 'opacity-70 ring-2 ring-brand scale-[.98]' : ''
                   }`}
                   draggable
                   onDragStart={(e) => handleDragStart(e, deal)}
@@ -341,7 +341,7 @@ export const SalesPipeline: React.FC<SalesPipelineProps> = ({ onEditDeal: _ }) =
                     <div className="flex items-center space-x-1">
                       <button
                         onClick={() => { setEditingDeal(deal); setIsEditOpen(true); }}
-                        className="text-xs text-[#4285F4] hover:text-blue-600"
+                        className="text-xs text-brand hover:text-blue-600"
                       >
                         View
                       </button>

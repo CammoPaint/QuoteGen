@@ -372,7 +372,7 @@ export const QuoteViewer: React.FC<QuoteViewerProps> = ({
                 <textarea
                   value={editedQuote.projectOverview}
                   onChange={(e) => setEditedQuote({ ...editedQuote, projectOverview: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
                   rows={4}
                 />
               ) : (
@@ -390,7 +390,7 @@ export const QuoteViewer: React.FC<QuoteViewerProps> = ({
                   type="number"
                   value={editedQuote.hourlyRate}
                   onChange={(e) => setEditedQuote({ ...editedQuote, hourlyRate: Number(e.target.value) })}
-                  className="w-40 px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                  className="w-40 px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
                 />
               ) : (
                 <div className="flex items-center space-x-3 text-gray-700">
@@ -406,7 +406,7 @@ export const QuoteViewer: React.FC<QuoteViewerProps> = ({
                 {isEditing && (
                   <button
                     onClick={addScopeItem}
-                    className="flex items-center space-x-2 px-4 py-2 text-sm bg-[#4285F4] text-white rounded-md hover:bg-blue-600 transition-colors"
+                    className="flex items-center space-x-2 px-4 py-2 text-sm bg-brand text-white rounded-md hover:bg-blue-600 transition-colors"
                   >
                     <Plus className="h-4 w-4" />
                     <span>Add Item</span>
@@ -426,14 +426,14 @@ export const QuoteViewer: React.FC<QuoteViewerProps> = ({
                               placeholder="Feature name"
                               value={item.feature}
                               onChange={(e) => handleScopeItemChange(index, 'feature', e.target.value)}
-                              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
                             />
                             <textarea
                               placeholder="Description"
                               value={item.description}
                               onChange={(e) => handleScopeItemChange(index, 'description', e.target.value)}
                               rows={3}
-                              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
                             />
                             <div className="grid grid-cols-2 gap-4">
                               <div>
@@ -442,7 +442,7 @@ export const QuoteViewer: React.FC<QuoteViewerProps> = ({
                                   type="number"
                                   value={item.estimatedHours}
                                   onChange={(e) => handleScopeItemChange(index, 'estimatedHours', Number(e.target.value))}
-                                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#4285F4] focus:border-transparent"
+                                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
                                 />
                               </div>
                               <div>
@@ -540,7 +540,7 @@ export const QuoteViewer: React.FC<QuoteViewerProps> = ({
                 </button>
                 <button
                   onClick={handleSave}
-                  className="px-6 py-3 bg-[#4285F4] text-white rounded-md hover:bg-blue-600 transition-colors"
+                  className="px-6 py-3 bg-brand text-white rounded-md hover:bg-blue-600 transition-colors"
                 >
                   Save Changes
                 </button>
@@ -573,7 +573,7 @@ export const QuoteViewer: React.FC<QuoteViewerProps> = ({
               <div className="flex items-center space-x-2">
                 <button
                   onClick={copyPromptToClipboard}
-                  className="flex items-center space-x-2 px-4 py-2 bg-[#4285F4] text-white rounded-md hover:bg-blue-600 transition-colors"
+                  className="flex items-center space-x-2 px-4 py-2 bg-brand text-white rounded-md hover:bg-blue-600 transition-colors"
                 >
                   <Copy className="h-4 w-4" />
                   <span>Copy to Clipboard</span>
