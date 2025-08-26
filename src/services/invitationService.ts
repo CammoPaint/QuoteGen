@@ -9,7 +9,9 @@ import {
   query, 
   where, 
   orderBy, 
-  serverTimestamp 
+  serverTimestamp,
+  setDoc,
+  Timestamp 
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { Invitation } from '../types';
@@ -156,16 +158,16 @@ export const invitationService = {
         invitedByName,
         companyId,
         token,
-        expiresAt: expiresAt.toISOString(),
+        // Store as Firestore Timestamp to satisfy security rules comparisons
+        expiresAt: Timestamp.fromDate(expiresAt),
+        createdAt: serverTimestamp(),
       };
 
-      const docRef = await addDoc(collection(db, COLLECTION_NAME), {
-        ...invitationData,
-        createdAt: serverTimestamp(),
-      });
-      
+      // Important: use the token as the document ID so public read by token works
+      const targetRef = doc(db, COLLECTION_NAME, token);
+      await setDoc(targetRef, invitationData);
 
-      return docRef.id;
+      return token;
     } catch (error) {
       console.error('Error creating invitation with token:', error);
       
