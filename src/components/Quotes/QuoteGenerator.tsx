@@ -1,25 +1,79 @@
-import React, { useState } from 'react';
-import { Bot, Loader2, DollarSign } from 'lucide-react';
-import { Customer, QuoteGenerationRequest } from '../../types';
+import React, { useState, useEffect } from 'react';
+import { Bot, Loader2, DollarSign, FileText } from 'lucide-react';
+import { Customer, QuoteGenerationRequest, Solution } from '../../types';
 import { generateQuote } from '../../services/aiService';
+import { CustomerLeadPicker } from '../Shared/CustomerLeadPicker';
 
 interface QuoteGeneratorProps {
   customers: Customer[];
   onQuoteGenerated: (quote: any) => void;
   onClose: () => void;
+  initialCustomerId?: string;
 }
 
 export const QuoteGenerator: React.FC<QuoteGeneratorProps> = ({
   customers,
   onQuoteGenerated,
-  onClose
+  onClose,
+  initialCustomerId
 }) => {
-  const [selectedCustomerId, setSelectedCustomerId] = useState('');
+  const [selectedCustomerId, setSelectedCustomerId] = useState(initialCustomerId || '');
   const [projectDescription, setProjectDescription] = useState('');
   const [hourlyRate, setHourlyRate] = useState(50);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [solutions, setSolutions] = useState<Solution[]>([]);
+  const [selectedSolutionId, setSelectedSolutionId] = useState('');
+  const [isLoadingSolutions, setIsLoadingSolutions] = useState(true);
 
   const selectedCustomer = customers.find(c => c.id === selectedCustomerId);
+
+  // Fetch solutions from the API
+  useEffect(() => {
+    const fetchSolutions = async () => {
+      try {
+        const response = await fetch('https://insytifycms-default-rtdb.firebaseio.com/solutions.json');
+        const data = await response.json();
+        
+        // Transform the Firebase data structure to our Solution interface
+        const solutionsArray: Solution[] = Object.entries(data).map(([key, value]: [string, any]) => ({
+          id: key,
+          title: value.title || '',
+          prompt: value.prompt || '',
+          description: value.description || '',
+          isActive: value.isActive !== false, // Default to true if not specified
+          updatedAt: value.updatedAt || ''
+        })).filter(solution => solution.isActive && solution.prompt); // Only show active solutions with prompts
+        
+        setSolutions(solutionsArray);
+      } catch (error) {
+        console.error('Failed to fetch solutions:', error);
+      } finally {
+        setIsLoadingSolutions(false);
+      }
+    };
+
+    fetchSolutions();
+  }, []);
+
+  // Update selectedCustomerId when initialCustomerId changes
+  useEffect(() => {
+    if (initialCustomerId) {
+      setSelectedCustomerId(initialCustomerId);
+    }
+  }, [initialCustomerId]);
+
+  // Handle solution selection
+  const handleSolutionSelect = (solutionId: string) => {
+    setSelectedSolutionId(solutionId);
+    if (solutionId) {
+      const selectedSolution = solutions.find(s => s.id === solutionId);
+      if (selectedSolution) {
+        setProjectDescription(selectedSolution.prompt);
+      }
+    } else {
+      setProjectDescription('');
+    }
+  };
 
   const handleGenerate = async () => {
     if (!selectedCustomer || !projectDescription.trim()) return;
@@ -71,20 +125,43 @@ export const QuoteGenerator: React.FC<QuoteGeneratorProps> = ({
             <label htmlFor="customer" className="block text-sm font-medium text-gray-700 mb-2">
               Select Customer *
             </label>
+                         <CustomerLeadPicker
+               customers={customers}
+               value={selectedCustomerId}
+               onChange={setSelectedCustomerId}
+               placeholder="Search for customer or lead..."
+             />
+          </div>
+
+          <div>
+            <label htmlFor="solutions" className="block text-sm font-medium text-gray-700 mb-2">
+              Select Solution Template (Optional)
+            </label>
             <select
-              id="customer"
-              value={selectedCustomerId}
-              onChange={(e) => setSelectedCustomerId(e.target.value)}
+              id="solutions"
+              value={selectedSolutionId}
+              onChange={(e) => handleSolutionSelect(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
-              required
             >
-              <option value="">Choose a customer...</option>
-              {customers.map((customer) => (
-                <option key={customer.id} value={customer.id}>
-                  {customer.companyName} - {customer.contactName}
-                </option>
-              ))}
+              <option value="">Choose a solution template...</option>
+              {isLoadingSolutions ? (
+                <option value="">Loading solutions...</option>
+              ) : solutions.length === 0 ? (
+                <option value="">No solutions found.</option>
+              ) : (
+                solutions.map((solution) => (
+                  <option key={solution.id} value={solution.id}>
+                    {solution.title}
+                  </option>
+                ))
+              )}
             </select>
+            {selectedSolutionId && (
+              <p className="text-sm text-gray-500 mt-1">
+                <FileText className="h-4 w-4 inline-block mr-1" />
+                Selected Solution: {solutions.find(s => s.id === selectedSolutionId)?.title || 'N/A'}
+              </p>
+            )}
           </div>
 
           <div>

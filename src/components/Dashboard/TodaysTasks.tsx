@@ -8,10 +8,20 @@ interface TodaysTasksProps {
 }
 
 export const TodaysTasks: React.FC<TodaysTasksProps> = ({ tasks, onTaskClick }) => {
-  const todaysTasks = tasks.filter(task => {
-    const today = new Date().toDateString();
-    const taskDate = new Date(task.dateDue).toDateString();
-    return taskDate === today && task.status !== 'completed';
+  // Show tasks due this week (Mon–Sun), excluding completed
+  const thisWeeksTasks = tasks.filter(task => {
+    const now = new Date();
+    const startOfWeek = new Date(now);
+    const day = now.getDay(); // 0=Sun, 1=Mon, ...
+    const diffToMonday = (day === 0 ? -6 : 1) - day; // move to Monday
+    startOfWeek.setHours(0, 0, 0, 0);
+    startOfWeek.setDate(now.getDate() + diffToMonday);
+
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 7); // exclusive end
+
+    const due = new Date(task.dateDue);
+    return due >= startOfWeek && due < endOfWeek && task.status !== 'completed';
   });
 
   const getPriorityColor = (priority: string) => {
@@ -43,18 +53,18 @@ export const TodaysTasks: React.FC<TodaysTasksProps> = ({ tasks, onTaskClick }) 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200">
       <div className="p-6 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">Today's Tasks</h3>
+        <h3 className="text-lg font-semibold text-gray-900">This Week's Tasks</h3>
       </div>
       <div className="p-6">
-        {todaysTasks.length === 0 ? (
+        {thisWeeksTasks.length === 0 ? (
           <div className="text-center py-8">
             <CheckSquare className="mx-auto h-12 w-12 text-gray-300" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No tasks for today</h3>
-            <p className="mt-1 text-sm text-gray-500">All caught up! Great work.</p>
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No tasks due this week</h3>
+            <p className="mt-1 text-sm text-gray-500">All caught up for the week! Great work.</p>
           </div>
         ) : (
           <div className="space-y-3">
-            {todaysTasks.map((task) => (
+            {thisWeeksTasks.map((task) => (
               <div
                 key={task.id}
                 onClick={() => onTaskClick(task)}

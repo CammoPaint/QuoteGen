@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, ChevronDown, User, Building } from 'lucide-react';
+import { Search, ChevronDown, User, Building, Mail, Phone } from 'lucide-react';
 import { Customer } from '../../types';
 
 interface CustomerLeadPickerProps {
@@ -102,7 +102,7 @@ export const CustomerLeadPicker: React.FC<CustomerLeadPickerProps> = ({
                   </div>
                   {selectedCustomer.contactName && (
                     <div className="text-xs text-gray-500 truncate">
-                      {selectedCustomer.contactName} • {getCustomerTypeLabel(selectedCustomer)}
+                      {selectedCustomer.contactName}
                     </div>
                   )}
                 </div>
@@ -114,6 +114,32 @@ export const CustomerLeadPicker: React.FC<CustomerLeadPickerProps> = ({
               </>
             )}
           </div>
+          {selectedCustomer && (selectedCustomer.emailAddress || selectedCustomer.phoneNumber) && (
+            <div className="hidden sm:flex items-center space-x-3 pr-2">
+              {selectedCustomer.emailAddress && (
+                <a
+                  href={`mailto:${selectedCustomer.emailAddress}`}
+                  className="flex items-center text-xs text-brand hover:underline"
+                  onClick={(e) => e.stopPropagation()}
+                  title={selectedCustomer.emailAddress}
+                >
+                  <Mail className="h-3 w-3 mr-1 text-gray-400" />
+                  <span className="truncate max-w-[10rem]">{selectedCustomer.emailAddress}</span>
+                </a>
+              )}
+              {selectedCustomer.phoneNumber && (
+                <a
+                  href={`tel:${selectedCustomer.phoneNumber}`}
+                  className="flex items-center text-xs text-brand hover:underline"
+                  onClick={(e) => e.stopPropagation()}
+                  title={selectedCustomer.phoneNumber}
+                >
+                  <Phone className="h-3 w-3 mr-1 text-gray-400" />
+                  <span className="truncate max-w-[8rem]">{selectedCustomer.phoneNumber}</span>
+                </a>
+              )}
+            </div>
+          )}
           {!disabled && (
             <ChevronDown 
               className={`h-4 w-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} 

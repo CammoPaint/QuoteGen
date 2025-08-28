@@ -4,11 +4,9 @@ import {
   Users, 
   FileText, 
   CheckSquare, 
-  BarChart3,
   Settings,
   Target,
   TrendingUp,
-  DollarSign,
   MapPin
 } from 'lucide-react';
 
@@ -25,6 +23,7 @@ const navigation = [
   { id: 'pipeline', name: 'Pipeline', icon: TrendingUp },  
   { id: 'customers', name: 'Customers', icon: Users },
   { id: 'quotes', name: 'Quotes', icon: FileText },
+  { id: 'solutions', name: 'Solutions', icon: Target },
   // { id: 'commissions', name: 'Commissions', icon: DollarSign },
   // { id: 'analytics', name: 'Analytics', icon: BarChart3 },
   { id: 'users', name: 'Team Members', icon: Users },

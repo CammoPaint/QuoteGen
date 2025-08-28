@@ -24,13 +24,14 @@ import { LeadDetails } from './components/Sales/LeadDetails';
 import LeadSearch from './components/Sales/LeadSearch';
 import { SalesPipeline } from './components/Sales/SalesPipeline';
 import { CommissionTracker } from './components/Sales/CommissionTracker';
+import { SolutionsList, SolutionDetail } from './components/Solutions';
 import { useCustomers } from './hooks/useCustomers';
 import { useQuotes } from './hooks/useQuotes';
 import { quoteService } from './services/quoteService';
 import { useTasks } from './hooks/useTasks';
 import { useCommissions } from './hooks/useCommissions';
 import { useUsers } from './hooks/useUsers';
-import { Customer, Quote, Task } from './types';
+import { Customer, Quote, Task, Solution } from './types';
 import UserFilterDropdown from './components/Shared/UserFilterDropdown';
 
 // Simple router to handle invitation acceptance
@@ -169,6 +170,7 @@ const AppContent: React.FC = () => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
+  const [selectedSolution, setSelectedSolution] = useState<Solution | null>(null);
   // Removed unused selectedLead and selectedCommission state
   
   // User selector states for quotes
@@ -556,8 +558,8 @@ const AppContent: React.FC = () => {
               setActiveTab('leads');
             }}
             onAddQuote={() => {
-              // Handle adding quote for this lead
-              setActiveTab('quotes');
+              // Open quote generator modal for this lead
+              setShowQuoteGenerator(true);
             }}
           />
         ) : (
@@ -592,8 +594,8 @@ const AppContent: React.FC = () => {
               setActiveTab('customers');
             }}
             onAddQuote={() => {
-              // Handle adding quote for this customer
-              setActiveTab('quotes');
+              // Open quote generator modal for this customer
+              setShowQuoteGenerator(true);
             }}
             onQuoteClick={(quote) => {
               setSelectedQuote(quote);
@@ -604,6 +606,30 @@ const AppContent: React.FC = () => {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">Customer Not Found</h2>
             <p className="text-gray-600">The requested customer could not be found.</p>
+          </div>
+        );
+      case 'solutions':
+        return (
+          <SolutionsList
+            onSolutionClick={(solution) => {
+              setSelectedSolution(solution);
+              setActiveTab('solution-detail');
+            }}
+          />
+        );
+      case 'solution-detail':
+        return selectedSolution ? (
+          <SolutionDetail
+            solution={selectedSolution}
+            onBack={() => {
+              setSelectedSolution(null);
+              setActiveTab('solutions');
+            }}
+          />
+        ) : (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Solution Not Found</h2>
+            <p className="text-gray-600">The requested solution could not be found.</p>
           </div>
         );
       case 'settings':
@@ -648,6 +674,12 @@ const AppContent: React.FC = () => {
       {showQuoteGenerator && (
         <QuoteGenerator
           customers={customers}
+          initialCustomerId={
+            (activeTab === 'customer-details' && selectedCustomerId) || 
+            (activeTab === 'lead-details' && selectedLeadId) 
+              ? (selectedCustomerId || selectedLeadId || undefined) 
+              : undefined
+          }
           onQuoteGenerated={async (quote) => {
             try {
               const newId = await addQuote(quote);

@@ -77,6 +77,43 @@ export interface Attachment {
   uploadedAt: string;
 }
 
+export interface Solution {
+  id: string;
+  title: string;
+  prompt: string;
+  description: string;
+  isActive: boolean;
+  updatedAt: string;
+  // Additional fields for solutions display
+  heroImage?: string;
+  heroTitle?: string;
+  heroSubtitle?: string;
+  benefitList?: {
+    title?: string;
+    description?: string;
+    benefits?: Array<{
+      title: string;
+      description: string;
+      imageUrl?: string;
+    }>;
+  };
+  featureList?: {
+    title?: string;
+    description?: string;
+    features?: Array<{
+      title: string;
+      description: string;
+      icon: string;
+    }>;
+  };
+  cta?: {
+    title?: string;
+    description?: string;
+    buttonText?: string;
+    highlightedText?: string;
+  };
+}
+
 export interface ScopeItem {
   id: string;
   feature: string;

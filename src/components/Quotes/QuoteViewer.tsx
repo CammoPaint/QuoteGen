@@ -33,6 +33,18 @@ export const QuoteViewer: React.FC<QuoteViewerProps> = ({
   const [showActionMenu, setShowActionMenu] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [previewUrl, setPreviewUrl] = useState('');
+  const [showAddScopeItemModal, setShowAddScopeItemModal] = useState(false);
+  const [newScopeItem, setNewScopeItem] = useState<Omit<ScopeItem, 'id'>>({
+    feature: '',
+    description: '',
+    estimatedHours: 0,
+    estimatedCost: 0
+  });
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [isEditingScopeItem, setIsEditingScopeItem] = useState(false);
+  const [editingScopeItemIndex, setEditingScopeItemIndex] = useState<number>(-1);
+  const [editingScopeItem, setEditingScopeItem] = useState<ScopeItem | null>(null);
   const { activeTemplate } = useTemplates();
 
   const handleScopeItemChange = (index: number, field: keyof ScopeItem, value: string | number) => {
@@ -56,21 +68,125 @@ export const QuoteViewer: React.FC<QuoteViewerProps> = ({
   };
 
   const addScopeItem = () => {
-    const newItem: ScopeItem = {
-      id: Date.now().toString(),
+    setNewScopeItem({
       feature: '',
       description: '',
       estimatedHours: 0,
       estimatedCost: 0
+    });
+    setShowAddScopeItemModal(true);
+  };
+
+  const handleAddScopeItem = () => {
+    if (!newScopeItem.feature.trim() || !newScopeItem.description.trim()) {
+      alert('Please fill in both feature name and description');
+      return;
+    }
+
+    const newItem: ScopeItem = {
+      id: Date.now().toString(),
+      ...newScopeItem,
+      estimatedCost: newScopeItem.estimatedHours * editedQuote.hourlyRate
     };
 
-    setEditedQuote({
+    const updatedQuote = {
       ...editedQuote,
       scopeOfWork: [...editedQuote.scopeOfWork, newItem]
+    };
+
+    // Save the quote automatically
+    onEdit(updatedQuote);
+    
+    // Update local state
+    setEditedQuote(updatedQuote);
+
+    setShowAddScopeItemModal(false);
+    setNewScopeItem({
+      feature: '',
+      description: '',
+      estimatedHours: 0,
+      estimatedCost: 0
+    });
+
+    // Show success toast
+    showToastMessage(`Scope item "${newItem.feature}" added and saved successfully!`);
+  };
+
+  const handleNewScopeItemChange = (field: keyof Omit<ScopeItem, 'id'>, value: string | number) => {
+    setNewScopeItem(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleEditScopeItem = (index: number) => {
+    const item = editedQuote.scopeOfWork[index];
+    setEditingScopeItem({ ...item });
+    setEditingScopeItemIndex(index);
+    setIsEditingScopeItem(true);
+  };
+
+  const handleEditingScopeItemChange = (field: keyof Omit<ScopeItem, 'id'>, value: string | number | any[]) => {
+    if (!editingScopeItem) return;
+    
+    setEditingScopeItem(prev => {
+      if (!prev) return prev;
+      const updated = { ...prev, [field]: value };
+      
+      // Recalculate cost if hours changed
+      if (field === 'estimatedHours') {
+        updated.estimatedCost = Number(value) * editedQuote.hourlyRate;
+      }
+      
+      return updated;
     });
   };
 
+  const handleSaveScopeItem = () => {
+    if (!editingScopeItem || editingScopeItemIndex === -1) return;
+    
+    if (!editingScopeItem.feature.trim() || !editingScopeItem.description.trim()) {
+      alert('Please fill in both feature name and description');
+      return;
+    }
+
+    const updatedScopeOfWork = [...editedQuote.scopeOfWork];
+    updatedScopeOfWork[editingScopeItemIndex] = editingScopeItem;
+    
+    const totalCost = updatedScopeOfWork.reduce((sum, item) => sum + item.estimatedCost, 0);
+
+    const updatedQuote = {
+      ...editedQuote,
+      scopeOfWork: updatedScopeOfWork,
+      totalEstimatedCost: totalCost
+    };
+
+    // Save the quote automatically
+    onEdit(updatedQuote);
+    
+    // Update local state
+    setEditedQuote(updatedQuote);
+
+    // Close modal and reset state
+    setIsEditingScopeItem(false);
+    setEditingScopeItemIndex(-1);
+    setEditingScopeItem(null);
+
+    // Show success toast
+    showToastMessage(`Scope item "${editingScopeItem.feature}" updated successfully!`);
+  };
+
+  const showToastMessage = (message: string) => {
+    setToastMessage(message);
+    setShowToast(true);
+    // Auto-hide toast after 3 seconds
+    setTimeout(() => {
+      setShowToast(false);
+    }, 3000);
+  };
+
   const removeScopeItem = (index: number) => {
+    const itemToRemove = editedQuote.scopeOfWork[index];
     const updatedScopeOfWork = editedQuote.scopeOfWork.filter((_, i) => i !== index);
     const totalCost = updatedScopeOfWork.reduce((sum, item) => sum + item.estimatedCost, 0);
 
@@ -79,10 +195,35 @@ export const QuoteViewer: React.FC<QuoteViewerProps> = ({
       scopeOfWork: updatedScopeOfWork,
       totalEstimatedCost: totalCost
     });
+
+    // Show toast for removed item
+    showToastMessage(`Scope item "${itemToRemove.feature}" removed successfully!`);
   };
 
   const handleSave = () => {
-    onEdit(editedQuote);
+    // Check if hourly rate has changed and recalculate all costs
+    if (editedQuote.hourlyRate !== quote.hourlyRate) {
+      const updatedScopeOfWork = editedQuote.scopeOfWork.map(item => ({
+        ...item,
+        estimatedCost: item.estimatedHours * editedQuote.hourlyRate
+      }));
+      
+      const totalCost = updatedScopeOfWork.reduce((sum, item) => sum + item.estimatedCost, 0);
+      
+      const updatedQuote = {
+        ...editedQuote,
+        scopeOfWork: updatedScopeOfWork,
+        totalEstimatedCost: totalCost
+      };
+      
+      onEdit(updatedQuote);
+      setEditedQuote(updatedQuote);
+      showToastMessage('Quote updated successfully! All costs recalculated based on new hourly rate.');
+    } else {
+      onEdit(editedQuote);
+      showToastMessage('Quote updated successfully!');
+    }
+    
     setIsEditing(false);
   };
 
@@ -259,6 +400,22 @@ export const QuoteViewer: React.FC<QuoteViewerProps> = ({
               </div>
             </div>
             <div className="flex items-center space-x-3">
+              {isEditing && (
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={handleSave}
+                    className="flex items-center space-x-2 px-4 py-2 bg-brand text-white rounded-md hover:bg-blue-600 transition-colors"
+                  >
+                    <span>Save Changes</span>
+                  </button>
+                  <button
+                    onClick={handleCancel}
+                    className="flex items-center space-x-2 px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+                  >
+                    <span>Cancel</span>
+                  </button>
+                </div>
+              )}
               {!isEditing && (
                 <div className="relative">
                   <button
@@ -386,12 +543,24 @@ export const QuoteViewer: React.FC<QuoteViewerProps> = ({
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-3">Hourly Rate</h3>
               {isEditing ? (
-                <input
-                  type="number"
-                  value={editedQuote.hourlyRate}
-                  onChange={(e) => setEditedQuote({ ...editedQuote, hourlyRate: Number(e.target.value) })}
-                  className="w-40 px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
-                />
+                <div>
+                  <input
+                    type="number"
+                    value={editedQuote.hourlyRate}
+                    onChange={(e) => setEditedQuote({ ...editedQuote, hourlyRate: Number(e.target.value) })}
+                    className="w-40 px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
+                  />
+                  {editedQuote.hourlyRate !== quote.hourlyRate && (
+                    <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                      <p className="text-sm text-blue-800">
+                        <strong>Note:</strong> Changing the hourly rate will recalculate all item costs when you save.
+                      </p>
+                      <p className="text-xs text-blue-600 mt-1">
+                        Current total: ${editedQuote.scopeOfWork.reduce((sum, item) => sum + (item.estimatedHours * editedQuote.hourlyRate), 0).toLocaleString()}
+                      </p>
+                    </div>
+                  )}
+                </div>
               ) : (
                 <div className="flex items-center space-x-3 text-gray-700">
                   <span className="text-lg">${quote.hourlyRate}/hour</span>
@@ -419,45 +588,7 @@ export const QuoteViewer: React.FC<QuoteViewerProps> = ({
                   <div key={item.id} className="border border-gray-200 rounded-lg p-6">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        {isEditing ? (
-                          <div className="space-y-4">
-                            <input
-                              type="text"
-                              placeholder="Feature name"
-                              value={item.feature}
-                              onChange={(e) => handleScopeItemChange(index, 'feature', e.target.value)}
-                              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
-                            />
-                            <textarea
-                              placeholder="Description"
-                              value={item.description}
-                              onChange={(e) => handleScopeItemChange(index, 'description', e.target.value)}
-                              rows={3}
-                              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
-                            />
-                            <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Hours</label>
-                                <input
-                                  type="number"
-                                  value={item.estimatedHours}
-                                  onChange={(e) => handleScopeItemChange(index, 'estimatedHours', Number(e.target.value))}
-                                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Cost</label>
-                                <input
-                                  type="number"
-                                  value={item.estimatedCost}
-                                  readOnly
-                                  className="w-full px-4 py-3 border border-gray-300 rounded-md bg-gray-50"
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        ) : (
-                          <>
+                        <>
                             <h4 className="text-lg font-medium text-gray-900 mb-2">{item.feature}</h4>
                             <p className="text-gray-600 leading-relaxed mb-4">{item.description}</p>
                             
@@ -481,19 +612,38 @@ export const QuoteViewer: React.FC<QuoteViewerProps> = ({
                                 <span>{item.estimatedHours} hours</span>
                               </span>
                               <span className="flex items-center space-x-1">
-                                <span>${item.estimatedCost.toLocaleString()}</span>
+                                <span>
+                                  ${isEditing && editedQuote.hourlyRate !== quote.hourlyRate 
+                                    ? (item.estimatedHours * editedQuote.hourlyRate).toLocaleString()
+                                    : item.estimatedCost.toLocaleString()
+                                  }
+                                </span>
+                                {isEditing && editedQuote.hourlyRate !== quote.hourlyRate && (
+                                  <span className="text-xs text-blue-600">
+                                    (was ${item.estimatedCost.toLocaleString()})
+                                  </span>
+                                )}
                               </span>
                             </div>
-                          </>
-                        )}
+                        </>
                       </div>
                       {isEditing && (
-                        <button
-                          onClick={() => removeScopeItem(index)}
-                          className="ml-6 p-2 text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                        >
-                          <Trash2 className="h-5 w-5" />
-                        </button>
+                        <div className="flex items-center space-x-2 ml-6">
+                          <button
+                            onClick={() => handleEditScopeItem(index)}
+                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                            title="Edit item"
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => removeScopeItem(index)}
+                            className="p-2 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                            title="Delete item"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -505,9 +655,19 @@ export const QuoteViewer: React.FC<QuoteViewerProps> = ({
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
               <div className="flex items-center justify-between">
                 <span className="text-xl font-semibold text-gray-900">Total Estimated Cost</span>
-                <span className="text-3xl font-bold text-[#34A853]">
-                  ${(isEditing ? editedQuote : quote).totalEstimatedCost.toLocaleString()}
-                </span>
+                <div className="text-right">
+                  <span className="text-3xl font-bold text-[#34A853]">
+                    ${isEditing && editedQuote.hourlyRate !== quote.hourlyRate
+                      ? editedQuote.scopeOfWork.reduce((sum, item) => sum + (item.estimatedHours * editedQuote.hourlyRate), 0).toLocaleString()
+                      : (isEditing ? editedQuote : quote).totalEstimatedCost.toLocaleString()
+                    }
+                  </span>
+                  {isEditing && editedQuote.hourlyRate !== quote.hourlyRate && (
+                    <div className="text-sm text-blue-600 mt-1">
+                      <span>was ${quote.totalEstimatedCost.toLocaleString()}</span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -529,23 +689,7 @@ export const QuoteViewer: React.FC<QuoteViewerProps> = ({
               </div>
             )}
 
-            {/* Action Buttons */}
-            {isEditing && (
-              <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
-                <button
-                  onClick={handleCancel}
-                  className="px-6 py-3 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSave}
-                  className="px-6 py-3 bg-brand text-white rounded-md hover:bg-blue-600 transition-colors"
-                >
-                  Save Changes
-                </button>
-              </div>
-            )}
+
           </div>
         </div>
       </div>
@@ -671,6 +815,262 @@ export const QuoteViewer: React.FC<QuoteViewerProps> = ({
                 dangerouslySetInnerHTML={{ __html: previewUrl }}
                 className="preview-content"
               />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Scope Item Modal */}
+      {showAddScopeItemModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">Add Scope Item</h3>
+              <button
+                onClick={() => setShowAddScopeItemModal(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            <div className="p-6 space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Feature Name *
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter feature name"
+                  value={newScopeItem.feature}
+                  onChange={(e) => handleNewScopeItemChange('feature', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description *
+                </label>
+                <textarea
+                  placeholder="Describe the feature and what it includes"
+                  value={newScopeItem.description}
+                  onChange={(e) => handleNewScopeItemChange('description', e.target.value)}
+                  rows={4}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Estimated Hours *
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  placeholder="0"
+                  value={newScopeItem.estimatedHours}
+                  onChange={(e) => handleNewScopeItemChange('estimatedHours', Number(e.target.value))}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
+                />
+                <p className="text-sm text-gray-500 mt-1">
+                  Estimated cost: ${(newScopeItem.estimatedHours * editedQuote.hourlyRate).toFixed(2)}
+                </p>
+              </div>
+            </div>
+            <div className="flex justify-end space-x-3 p-6 border-t border-gray-200 bg-gray-50">
+              <button
+                onClick={() => setShowAddScopeItemModal(false)}
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddScopeItem}
+                disabled={!newScopeItem.feature.trim() || !newScopeItem.description.trim() || newScopeItem.estimatedHours <= 0}
+                className="px-4 py-2 bg-brand text-white rounded-md hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Add Item
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="fixed top-4 right-4 z-50">
+          <div className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2 animate-in slide-in-from-right-2 duration-300">
+            <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+            <span className="font-medium">{toastMessage}</span>
+            <button
+              onClick={() => setShowToast(false)}
+              className="ml-4 text-white hover:text-green-100 transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Scope Item Modal */}
+      {isEditingScopeItem && editingScopeItem && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">Edit Scope Item</h3>
+              <button
+                onClick={() => {
+                  setIsEditingScopeItem(false);
+                  setEditingScopeItemIndex(-1);
+                  setEditingScopeItem(null);
+                }}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            <div className="p-6 space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Feature Name *
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter feature name"
+                  value={editingScopeItem.feature}
+                  onChange={(e) => handleEditingScopeItemChange('feature', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description *
+                </label>
+                <textarea
+                  placeholder="Describe the feature and what it includes"
+                  value={editingScopeItem.description}
+                  onChange={(e) => handleEditingScopeItemChange('description', e.target.value)}
+                  rows={4}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
+                />
+              </div>
+              
+              {/* Included Items */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Included Items
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!editingScopeItem.items) {
+                        handleEditingScopeItemChange('items', [{ itemName: '', description: '' }]);
+                      } else {
+                        handleEditingScopeItemChange('items', [...editingScopeItem.items, { itemName: '', description: '' }]);
+                      }
+                    }}
+                    className="flex items-center space-x-1 px-3 py-1 text-sm bg-brand text-white rounded-md hover:bg-blue-600 transition-colors"
+                  >
+                    <Plus className="h-3 w-3" />
+                    <span>Add Item</span>
+                  </button>
+                </div>
+                
+                {editingScopeItem.items && editingScopeItem.items.length > 0 ? (
+                  <div className="space-y-3">
+                    {editingScopeItem.items?.map((item, index) => (
+                      <div key={index} className="flex items-start space-x-2 p-3 border border-gray-200 rounded-md bg-gray-50">
+                        <div className="flex-1 space-y-2">
+                          <input
+                            type="text"
+                            placeholder="Item name"
+                            value={item.itemName}
+                            onChange={(e) => {
+                              if (editingScopeItem.items) {
+                                const updatedItems = [...editingScopeItem.items];
+                                updatedItems[index] = { ...item, itemName: e.target.value };
+                                handleEditingScopeItemChange('items', updatedItems);
+                              }
+                            }}
+                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
+                          />
+                          <textarea
+                            placeholder="Item description"
+                            value={item.description}
+                            onChange={(e) => {
+                              if (editingScopeItem.items) {
+                                const updatedItems = [...editingScopeItem.items];
+                                updatedItems[index] = { ...item, description: e.target.value };
+                                handleEditingScopeItemChange('items', updatedItems);
+                              }
+                            }}
+                            rows={2}
+                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (editingScopeItem.items) {
+                              const updatedItems = editingScopeItem.items.filter((_, i) => i !== index);
+                              handleEditingScopeItemChange('items', updatedItems);
+                            }
+                          }}
+                          className="p-1 text-red-600 hover:bg-red-100 rounded-md transition-colors"
+                          title="Remove item"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-6 border-2 border-dashed border-gray-300 rounded-md">
+                    <p className="text-sm text-gray-500">No included items yet</p>
+                    <p className="text-xs text-gray-400 mt-1">Click "Add Item" to include specific deliverables</p>
+                  </div>
+                )}
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Estimated Hours *
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  placeholder="0"
+                  value={editingScopeItem.estimatedHours}
+                  onChange={(e) => handleEditingScopeItemChange('estimatedHours', Number(e.target.value))}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-transparent"
+                />
+                <p className="text-sm text-gray-500 mt-1">
+                  Estimated cost: ${(editingScopeItem.estimatedHours * editedQuote.hourlyRate).toFixed(2)}
+                </p>
+              </div>
+            </div>
+            <div className="flex justify-end space-x-3 p-6 border-t border-gray-200 bg-gray-50">
+              <button
+                onClick={() => {
+                  setIsEditingScopeItem(false);
+                  setEditingScopeItemIndex(-1);
+                  setEditingScopeItem(null);
+                }}
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveScopeItem}
+                disabled={!editingScopeItem.feature.trim() || !editingScopeItem.description.trim() || editingScopeItem.estimatedHours <= 0}
+                className="px-4 py-2 bg-brand text-white rounded-md hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Save Changes
+              </button>
             </div>
           </div>
         </div>

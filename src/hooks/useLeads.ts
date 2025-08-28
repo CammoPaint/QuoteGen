@@ -31,7 +31,8 @@ export const useLeads = () => {
       } else if (user.companyId) {
         page = await customerService.getLeadsPageForCompany(user.companyId, pageSize);
       } else {
-        page = await customerService.getLeadsPageForUser(user.id, pageSize);
+        // Default for non-admins: leads assigned to the user (not just created by them)
+        page = await customerService.getLeadsPageAssignedTo(user.id, pageSize);
       }
 
       setLeads(page.items);
@@ -68,7 +69,8 @@ export const useLeads = () => {
       } else if (user.companyId) {
         page = await customerService.getLeadsPageForCompany(user.companyId, pageSize, cursor);
       } else {
-        page = await customerService.getLeadsPageForUser(user.id, pageSize, cursor);
+        // Default for non-admins: leads assigned to the user (not just created by them)
+        page = await customerService.getLeadsPageAssignedTo(user.id, pageSize, cursor);
       }
       setLeads(prev => [...prev, ...page.items]);
       setCursor(page.lastDoc);
